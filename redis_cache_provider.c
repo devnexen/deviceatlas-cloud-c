@@ -1,5 +1,6 @@
 #ifdef   HAVE_HIREDIS
 #include <string.h>
+#include <stdlib.h>
 
 #include <hiredis/hiredis.h>
 
@@ -7,8 +8,13 @@
 
 static int
 redis_cache_setunixsock(void **cache_obj, char *cfg_str) {
-    *cache_obj = redisConnectUnix(cfg_str);
-    return (*cache_obj != NULL ? 0 : -1);
+    char *sockpath = strchr(cfg_str, ':');
+    if (sockpath != NULL && ++ *sockpath != 0) {
+        *cache_obj = redisConnectUnix(sockpath);
+        return (*cache_obj != NULL ? 0 : -1);
+    }
+
+    return (-1);
 }
 
 static int
@@ -34,7 +40,6 @@ redis_cache_init(struct da_cloud_cache_cfg *cfg) {
     char *cfg_str = cfg->cache_cfg_str;
     cfg->cache_obj = NULL;
     if (strncasecmp(cfg_str, "unix", 4) == 0 && strlen(cfg_str) > 5) {
-        cfg_str += 5;    
         return (redis_cache_setunixsock(&cfg->cache_obj, cfg_str));
     } else {
         return (redis_cache_settcp(&cfg->cache_obj, cfg_str));

@@ -71,5 +71,7 @@ int da_cloud_detect(struct da_cloud_config *, struct da_cloud_header_head *, str
 void da_cloud_properties_free(struct da_cloud_property_head *);
 void da_cloud_fini(struct da_cloud_config *);
 
+#ifdef __cplusplus
+}
 #endif
 #endif

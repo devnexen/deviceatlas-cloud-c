@@ -19,11 +19,11 @@ void file_cache_mkdir(char *dir, size_t dirlen, const char *key) {
     memset(&s, 0, sizeof(s));
     memset(dir + dirlen, 0, sizeof(dir) - dirlen);
     strcat(dir, "/");
-    strncat(dir, key, 8);
+    strncat(dir, key, 1);
     if (stat(dir, &s) != 0)
         mkdir(dir, 0777);
     strcat(dir, "/");
-    strcat(dir, key);    
+    strcat(dir, key + 1);    
 }
 
 int
