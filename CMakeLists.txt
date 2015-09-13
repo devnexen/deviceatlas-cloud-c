@@ -8,6 +8,7 @@ find_path(HAVE_JANSSON jansson.h)
 
 # cache providers
 find_path(HAVE_MEMCACHED libmemcached/memcached.h)
+find_path(HAVE_HIREDIS hiredis/hiredis.h)
 
 set(CACHELIBS "")
 
@@ -33,6 +34,13 @@ if (NOT ${HAVE_MEMCACHED} STREQUAL "HAVE_MEMCACHED-NOTFOUND")
     find_library(MEMCACHED memcached)
     find_library(MEMCACHEDUTIL memcachedutil)
     set(CACHELIBS ${MEMCACHED} ${MEMCACHEDUTIL})
+endif()
+
+if (NOT ${HAVE_HIREDIS} STREQUAL "HAVE_REDIS-NOTFOUND")
+    add_definitions(-DHAVE_HIREDIS)
+    message(STATUS "Redis support")
+    find_library(HIREDIS hiredis)
+    set(CACHELIBS ${CACHELIBS} ${HIREDIS})
 endif()
 
 find_library(CONFIG config)

@@ -50,4 +50,11 @@ cache_set(struct da_cloud_cache_ops *cops, const char *cache_name) {
         errx(1, "no memcached support enabled");
 #endif
     }
+    if (strcasecmp(cache_name, "redis") == 0) {
+#ifdef	HAVE_HIREDIS
+        CACHE_SET(cops, redis);
+#else
+        errx(1, "no redis support enabled");
+#endif
+    }
 }

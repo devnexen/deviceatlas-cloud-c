@@ -5,6 +5,7 @@
 
 #ifdef   HAVE_MEMCACHED
 #include "memcached_cache_provider.h"
+#include "redis_cache_provider.h"
 #endif
 
 #define  CACHE_SET(cops, name)         	\
