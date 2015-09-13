@@ -112,8 +112,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
 
     if (cache_name != NULL && cache_string != NULL) {
         config->cache_cfg.cache_cfg_str = strdup(cache_string);
-        if (strcasecmp(cache_name, "memcached") == 0)
-            CACHE_SET(config->cops, memcached);
+        cache_set(&config->cops, cache_name);
         if (config->cops.init(&config->cache_cfg) == -1) {
             free(config->cache_cfg.cache_cfg_str);
             fprintf(stderr, "could not set %s cache\n", cache_name);
@@ -335,7 +334,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
 
  jsoninit:
     response = json_loads(cacheval, JSON_PRESERVE_ORDER, &err);
-    if (err.text && strlen(err.text) > 0) {
+    if (strlen(err.text) > 0) {
         fprintf(stderr, "response: %s\n", err.text);
         fprintf(stderr, "got:\n%s\n", cacheval);
     } else {

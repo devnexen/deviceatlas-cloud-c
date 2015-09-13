@@ -5,10 +5,10 @@
 #include "memcached_cache_provider.h"
 #endif
 
-#define  CACHE_SET(cops, name)         \
-    cops.init = name ## _cache_init;   \
-    cops.get = name ## _cache_get;     \
-    cops.set = name ## _cache_set;     \
-    cops.fini = name ## _cache_fini
+#define  CACHE_SET(cops, name)         	\
+    cops->init = name ## _cache_init; 	\
+    cops->get = name ## _cache_get;     \
+    cops->set = name ## _cache_set;     \
+    cops->fini = name ## _cache_fini
 
 #endif

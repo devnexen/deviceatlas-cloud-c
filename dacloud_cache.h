@@ -1,6 +1,8 @@
 #ifndef  DACLOUD_CACHE_H
 #define  DACLOUD_CACHE_H
 
+#include <time.h>
+
 struct da_cloud_cache_cfg {
     void *data;
     void *cache_obj;
@@ -22,6 +24,8 @@ int mock_cache_init(struct da_cloud_cache_cfg *);
 int mock_cache_get(struct da_cloud_cache_cfg *, const char *, char **);
 int mock_cache_set(struct da_cloud_cache_cfg *, const char *, const char *);
 void mock_cache_fini(struct da_cloud_cache_cfg *);
+
+void cache_set(struct da_cloud_cache_ops *, const char *);
 
 #include "cache_providers.h"
 

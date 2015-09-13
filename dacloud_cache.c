@@ -1,5 +1,7 @@
 #include <sys/types.h>
 #include <openssl/sha.h>
+#include <string.h>
+#include <err.h>
 
 #include "dacloud_cache.h"
 
@@ -27,10 +29,20 @@ int
 mock_cache_init(struct da_cloud_cache_cfg *cfg) { (void)cfg; return (0); }
 
 int
-mock_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) { (void)cfg; (void)key; (void)value;  }
+mock_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) { (void)cfg; (void)key; (void)value; return (0);  }
 
 int
-mock_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) { (void)cfg; (void)key; (void)value; }
+mock_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) { (void)cfg; (void)key; (void)value; return (0); }
 
 void
 mock_cache_fini(struct da_cloud_cache_cfg *cfg) { (void)cfg; }
+
+void
+cache_set(struct da_cloud_cache_ops *cops, const char *cache_name) {
+if (strcasecmp(cache_name, "memcached") == 0)
+#ifdef	HAVE_MEMCACHED
+    CACHE_SET(cops, memcached);
+#else
+    errx(1, "no memcached support enabled");
+#endif
+}
