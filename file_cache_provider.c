@@ -56,8 +56,8 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
     if (cfg->cache_obj != NULL && value != NULL) {
          FILE *cache = NULL;
          struct stat s;
+         size_t valuelen;
          int cachefd = -1;
-         char buf[4096];
          struct file_cache_cfg *fcfg = cfg->cache_obj;
          file_cache_mkdir(fcfg->dir, fcfg->dirlen, key);
          cache = fopen(fcfg->dir, "r");
@@ -77,10 +77,14 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
              fclose(cache);
              return (-1);
          }
-         fread(buf, 1, sizeof(buf), cache);
+         fseek(cache, 0, SEEK_END);
+         valuelen = ftell(cache);
+         rewind(cache);
+
+         *value = malloc(sizeof(char) * valuelen + 1);
+         fgets(*value, valuelen + 1, cache);
          flock(cachefd, LOCK_UN);
          fclose(cache);
-         *value = strdup(buf);
          return (0);
     }
 
