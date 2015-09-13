@@ -48,7 +48,6 @@ memcached_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char 
         if (ret == MEMCACHED_SUCCESS)
             ret = memcached_set(client, key, strlen(key), value, strlen(value),
                     (time_t)(time(NULL) + cfg->expiration), 0);
-
         memcached_pool_push(cfg->cache_obj, client);
     }
 

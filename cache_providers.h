@@ -1,6 +1,8 @@
 #ifndef  CACHE_PROVIDERS_H
 #define  CACHE_PROVIDERS_H
 
+#include "file_cache_provider.h"
+
 #ifdef   HAVE_MEMCACHED
 #include "memcached_cache_provider.h"
 #endif
