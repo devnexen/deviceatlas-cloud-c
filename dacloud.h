@@ -7,6 +7,10 @@
 
 #include "dacloud_cache.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct da_cloud_header {
     char *key;
     char *value;
@@ -67,4 +71,5 @@ int da_cloud_detect(struct da_cloud_config *, struct da_cloud_header_head *, str
 void da_cloud_properties_free(struct da_cloud_property_head *);
 void da_cloud_fini(struct da_cloud_config *);
 
+#endif
 #endif
