@@ -48,9 +48,15 @@ find_library(CURL curl)
 find_library(JANSSON jansson)
 find_library(CRYPTO crypto)
 
+if (NOT LIBTYPE)
+    set(LIBTYPE SHARED)	
+endif()
+
+message(STATUS "${LIBTYPE} version")
+
 file(GLOB SRCS *.c)
 include_directories(${HAVE_CURL})
-add_library(dacloud SHARED ${SRCS})
+add_library(dacloud ${LIBTYPE} ${SRCS})
 target_link_libraries(dacloud ${CONFIG} ${CURL} ${JANSSON} ${CRYPTO} ${CACHELIBS})
 
 subdirs(examples)

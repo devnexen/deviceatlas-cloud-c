@@ -1,3 +1,5 @@
 include_directories(..)
 add_executable(dacloud_batch dacloud_batch.c)
 target_link_libraries(dacloud_batch dacloud)
+add_executable(dacloud_simplebench dacloud_simplebench.c)
+target_link_libraries(dacloud_simplebench dacloud)
