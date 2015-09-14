@@ -12,18 +12,22 @@ At the moment a simple disk, memcached and redis cache solutions are supported.
 A new cache handler can be written via the cache_provider interface as long as the library used is multi thread safe.
 
 1/ Operating systems
+====================
 
 * Tested on Linux, FreeBSD, OpenBSD and MacOS. 
 * Should work on NetBSD and Solaris based systems.
 
 2/ Dependencies
+===============
 
 a/ Mandatories
+
 * GCC (tested with 4.2.1 version and above) or clang (tested with 3.4.1 version and above).
 * CMake (tested with 2.8 version and above).
 * LibCURl.
 * LibConfig.
 
 b/ Optional
+
 * LibMemcached (works with old 0.4.x versions as well).
 * LibHiRedis.
