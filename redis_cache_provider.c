@@ -20,10 +20,10 @@ redis_cache_setunixsock(void **cache_obj, char *cfg_str) {
 static int
 redis_cache_settcp(void **cache_obj, char *cfg_str) {
     char *strport = strchr(cfg_str, ':');
-    size_t pos;
-    int port = 6379, tmp;
+    int port = 6379;
     if (strport != NULL && *(strport + 1) != 0) {
-        pos = strport - cfg_str;
+        int tmp;
+        size_t pos = strport - cfg_str;
         strport ++;
         tmp = strtol(strport, 0, 10);
         if (tmp >= 1024 && tmp <= 65535)
@@ -64,7 +64,6 @@ int
 redis_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) {
     if (cfg->cache_obj != NULL) {
         redisReply *ret;
-        int _ret;
         ret = redisCommand(cfg->cache_obj, "SETEX %s %d %s", key, (int)cfg->expiration, value);
         if (ret != NULL) {
             freeReplyObject(ret);
