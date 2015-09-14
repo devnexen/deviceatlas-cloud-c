@@ -17,17 +17,7 @@ print_properties(struct da_cloud_property_head phead) {
     struct da_cloud_property *p;
     size_t i = 0;
     SLIST_FOREACH(p, &phead.list, entries) {
-        printf("%s : ", p->name);
-        switch (p->type) {
-            case DA_CLOUD_STRING:
-                printf("%s", p->value.s);
-                break;
-            case DA_CLOUD_LONG:
-            case DA_CLOUD_BOOL:
-                printf("%ld", p->value.l);
-                break;
-        }
-        printf("\n");
+        da_cloud_print_property(stderr, p);
         i ++;
     }
     printf("source : %s\n", strlen(phead.cachesource) > 0 ? phead.cachesource : "none");
