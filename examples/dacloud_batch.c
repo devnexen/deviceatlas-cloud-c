@@ -28,7 +28,7 @@ int
 main(int argc, char *argv[]) {
     if (argc < 2)
         return (-1);
-    char *configpath = argv[1];
+    const char *configpath = argv[1];
     struct da_cloud_config config;
     memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath) == 0) {
