@@ -11,6 +11,11 @@
 extern "C" {
 #endif
 
+/**
+ * HTTP headers list struct
+ * fed by the consumer and used
+ * internally by CURL
+ */
 struct da_cloud_header {
     char *key;
     char *value;
@@ -31,6 +36,11 @@ enum da_cloud_property_type {
     DA_CLOUD_STRING
 };
 
+/**
+ * DeviceAtlas property list struct
+ * fed internally via the Cloud Service
+ * response data
+ */
 struct da_cloud_property {
     char *name;
     union {
@@ -42,10 +52,17 @@ struct da_cloud_property {
 };
 
 struct da_cloud_property_head {
+    /* can be 'cloud', 'cache' or empty */
     char cachesource[16];
     SLIST_HEAD(da_cloud_property_list, da_cloud_property) list;
 };
 
+/**
+ * Server list struct
+ * For internal server endpoint rankings
+ * Once the library is initialized via da_cloud_init()
+ * the list of servers will be ordered per response speed
+ */
 struct da_cloud_server {
     double response_time;
     char *host;
@@ -64,8 +81,15 @@ struct da_cloud_config {
     char *licence_key;
 };
 
+/* Handy function to print a server in the related stream */
 void da_cloud_print_server(FILE *, struct da_cloud_server *);
+/* Handy function to print a property in the related stream */
+void da_cloud_print_property(FILE *, struct da_cloud_property *);
 
+/**
+ *  da_cloud_init() must be called before entering in MT's context
+ *  da_cloud_fini() must be called when the library usage is ended
+ */
 int da_cloud_init(struct da_cloud_config *, const char *);
 int da_cloud_detect(struct da_cloud_config *, struct da_cloud_header_head *, struct da_cloud_property_head *);
 void da_cloud_properties_free(struct da_cloud_property_head *);

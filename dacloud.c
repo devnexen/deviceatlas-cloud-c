@@ -22,6 +22,29 @@ da_cloud_print_server(FILE *fp, struct da_cloud_server *s) {
                 s->port, s->response_time);
 }
 
+void
+da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
+    if (fp != NULL) {
+        enum da_cloud_property_type type = p->type;
+        fprintf(fp, "%s: ", p->name);
+        switch (type) {
+        case DA_CLOUD_LONG:
+            fprintf(fp, "%d", (int)p->value.l);
+            break;
+        case DA_CLOUD_BOOL:
+            fprintf(fp, "%s", (p->value.l > 0 ? "true" : "false"));
+            break;
+        case DA_CLOUD_STRING:
+            fprintf(fp, "%s", p->value.s);
+            break;
+        default:
+            break;
+        }
+
+        fprintf(fp, "\n");
+    }
+}
+
 int
 da_cloud_header_init(struct da_cloud_header_head *head)
 {

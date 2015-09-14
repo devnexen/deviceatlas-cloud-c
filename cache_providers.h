@@ -5,6 +5,8 @@
 
 #ifdef   HAVE_MEMCACHED
 #include "memcached_cache_provider.h"
+#endif
+#ifdef   HAVE_HIREDIS
 #include "redis_cache_provider.h"
 #endif
 
