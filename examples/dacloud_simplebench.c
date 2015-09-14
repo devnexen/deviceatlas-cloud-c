@@ -19,17 +19,19 @@ main(int argc, char *argv[]) {
     memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath) == 0) {
         struct da_cloud_header_head hhead;
-        struct da_cloud_property_head phead;
         size_t i = 0;
         memset(&hhead, 0, sizeof(hhead));
         da_cloud_header_init(&hhead);
         da_cloud_header_add(&hhead, "user-agent", "iPhone");
         time_t start = time(0);
-        for (i = 0; i < iterations; i ++)
+        for (i = 0; i < iterations; i ++) {
+            struct da_cloud_property_head phead;
             da_cloud_detect(&config, &hhead, &phead);
+            da_cloud_properties_free(&phead);
+        }
         time_t end = time(0);
-        da_cloud_properties_free(&phead);
         da_cloud_header_free(&hhead);
+        da_cloud_fini(&config);
 
         printf("Time in sec: %ld\n", (end - start));
     }
