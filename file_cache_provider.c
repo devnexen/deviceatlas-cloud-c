@@ -17,7 +17,7 @@ static
 void file_cache_mkdir(char *dir, size_t dirlen, const char *key) {
     struct stat s;
     memset(&s, 0, sizeof(s));
-    memset(dir + dirlen, 0, sizeof(dir) - dirlen);
+    dir[dirlen] = 0;
     strcat(dir, "/");
     strncat(dir, key, 1);
     if (stat(dir, &s) != 0)

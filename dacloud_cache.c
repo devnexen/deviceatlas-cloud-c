@@ -8,7 +8,6 @@
 void
 da_cloud_crypt_key(char *source, size_t sourcelen, char *result, size_t resultlen) {
     SHA256_CTX ctx;
-    size_t i;
     u_int8_t digest[SHA256_DIGEST_LENGTH];
     static u_int8_t a[] = "0123456789abcdef";
     SHA256_Init(&ctx);

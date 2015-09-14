@@ -69,6 +69,8 @@ da_cloud_properties_free(struct da_cloud_property_head *phead) {
         free(p);
         p = SLIST_FIRST(&phead->list);
     }
+
+    memset(phead->cachesource, 0, sizeof(phead->cachesource));
 }
 
 int
@@ -176,7 +178,6 @@ data_reader_free(struct data_reader *dr) {
         if (dr->buf != NULL)
             free(dr->buf);
         free(dr);
-        dr = NULL;
     }
 }
 
@@ -257,7 +258,6 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     size_t i;
     int _ret = -1;
     SLIST_INIT(&phead->list);
-    *phead->cachesource = 0;
 
     SLIST_FOREACH(h, &head->list, entries) {
         size_t keylen = strlen(h->key);
@@ -309,8 +309,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
             if (*dr->buf != '{') {
                 fprintf(stderr, "invalid json: %s\n", dr->buf);
                 data_reader_free(dr);
-		curl_slist_free_all(hd);
-		curl_easy_cleanup(c);
+                curl_slist_free_all(hd);
+                curl_easy_cleanup(c);
                 goto end;
             }
 
@@ -320,8 +320,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
             cacheval = strdup(dr->buf);
             strcpy(phead->cachesource, "cloud");
             data_reader_free(dr);
-	    curl_slist_free_all(hd);
-	    curl_easy_cleanup(c);
+            curl_slist_free_all(hd);
+            curl_easy_cleanup(c);
             _ret = 0;
             goto jsoninit;
         }
@@ -383,10 +383,9 @@ end:
 void
 da_cloud_fini(struct da_cloud_config *config) {
     if (config->shead != NULL) {
-        struct da_cloud_server *s;
         size_t i;
         for (i = 0; i < config->shead->nb; i ++) {
-            s = *(config->shead->servers + i);
+            struct da_cloud_server *s = *(config->shead->servers + i);
             free(s->host);
             free(s);
         }

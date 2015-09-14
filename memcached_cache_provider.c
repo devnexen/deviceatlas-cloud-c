@@ -42,7 +42,6 @@ memcached_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char 
     memcached_return_t ret = MEMCACHED_FAILURE;
     if (cfg->cache_obj != NULL) {
         memcached_st *client = NULL;
-        memcached_pool_st *pl;
         client = memcached_pool_pop(cfg->cache_obj, 1, &ret);
 
         if (ret == MEMCACHED_SUCCESS)
