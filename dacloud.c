@@ -114,7 +114,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
 
     config_t cfg;
     config_setting_t *servers, *server;
-    const char *licence_key, *cache_name, *cache_string;
+    const char *licence_key, *cache_name = NULL, *cache_string = NULL;
     size_t nservers = 0;
     config_init(&cfg);
     if (config_read_file(&cfg, confpath) != CONFIG_TRUE) {
