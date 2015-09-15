@@ -14,8 +14,8 @@ A new cache handler can be written via the cache_provider interface as long as t
 1/ Operating systems
 ====================
 
-* Tested on Linux, FreeBSD, OpenBSD and MacOS. 
-* Should work on NetBSD and Solaris based systems.
+* Tested on Linux, FreeBSD, OpenBSD, NetBSD and MacOS. 
+* Should work on Solaris based systems.
 
 2/ Dependencies
 ===============
