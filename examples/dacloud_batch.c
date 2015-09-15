@@ -42,10 +42,15 @@ main(int argc, char *argv[]) {
         for (i = 0; i < config.shead->nb; i ++)
             da_cloud_print_server(stderr, config.shead->servers[i]);
         while ((fgets(buf, sizeof(buf), stdin))) {
-            char *p = strdup(buf);
-            char *b = strstr(p, "\r\n");
+            char *p = buf;
+            while ((isspace(*p) || *p == '"') && p++);
+            char *b = strchr(p, '"');
+            if (b == NULL)
+                    b = strstr(p, "\r\n");
             if (b != NULL)
                 *(p + (b - p)) = 0;
+            if (strlen(p) == 0)
+                break;
             memset(&hhead, 0, sizeof(hhead));
             da_cloud_header_init(&hhead);
             da_cloud_header_add(&hhead, "user-agent", p);
@@ -54,7 +59,6 @@ main(int argc, char *argv[]) {
             print_properties(phead);
             da_cloud_properties_free(&phead);
             da_cloud_header_free(&hhead);
-            free(p);
         }
     }
     da_cloud_fini(&config);
