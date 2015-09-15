@@ -1,5 +1,8 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
 #include "dacloud.h"
 
 static void
@@ -34,25 +37,25 @@ main(int argc, char *argv[]) {
     if (da_cloud_init(&config, configpath) == 0) {
         struct da_cloud_header_head hhead;
         struct da_cloud_property_head phead;
+        char buf[1024];
         size_t i = 0;
-        memset(&hhead, 0, sizeof(hhead));
-        da_cloud_header_init(&hhead);
-        da_cloud_header_add(&hhead, "user-agent", "iPhone");
         for (i = 0; i < config.shead->nb; i ++)
             da_cloud_print_server(stderr, config.shead->servers[i]);
-        da_cloud_detect(&config, &hhead, &phead);
-        print_headers(hhead);
-        print_properties(phead);
-        da_cloud_properties_free(&phead);
-        da_cloud_header_free(&hhead);
-        memset(&hhead, 0, sizeof(hhead));
-        da_cloud_header_init(&hhead);
-        da_cloud_header_add(&hhead, "user-agent", "Dalvik/1.2.0 (Linux; U; Android 2.2.1; GT-S5830L Build/FROYO)");
-        da_cloud_detect(&config, &hhead, &phead);
-        print_headers(hhead);
-        print_properties(phead);
-        da_cloud_properties_free(&phead);
-        da_cloud_header_free(&hhead);
+        while ((fgets(buf, sizeof(buf), stdin))) {
+            char *p = strdup(buf);
+            char *b = strstr(p, "\r\n");
+            if (b != NULL)
+                *(p + (b - p)) = 0;
+            memset(&hhead, 0, sizeof(hhead));
+            da_cloud_header_init(&hhead);
+            da_cloud_header_add(&hhead, "user-agent", p);
+            da_cloud_detect(&config, &hhead, &phead);
+            print_headers(hhead);
+            print_properties(phead);
+            da_cloud_properties_free(&phead);
+            da_cloud_header_free(&hhead);
+            free(p);
+        }
     }
     da_cloud_fini(&config);
     return (0);
