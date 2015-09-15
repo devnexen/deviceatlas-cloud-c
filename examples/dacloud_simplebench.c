@@ -23,17 +23,22 @@ main(int argc, char *argv[]) {
         memset(&hhead, 0, sizeof(hhead));
         da_cloud_header_init(&hhead);
         da_cloud_header_add(&hhead, "user-agent", "iPhone");
-        time_t start = time(0);
-        for (i = 0; i < iterations; i ++) {
-            struct da_cloud_property_head phead;
-            da_cloud_detect(&config, &hhead, &phead);
-            da_cloud_properties_free(&phead);
+        struct timeval start, end;
+        double timetotal = 0.0;
+        if (gettimeofday(&start, NULL) == 0) {
+            for (i = 0; i < iterations; i ++) {
+                struct da_cloud_property_head phead;
+                da_cloud_detect(&config, &hhead, &phead);
+                da_cloud_properties_free(&phead);
+            }
+            gettimeofday(&end, NULL);
+            timetotal = (double)((end.tv_sec + ((double)(end.tv_usec / 1000000))) -
+                    ((start.tv_sec + ((double)(start.tv_usec / 1000000)))));
         }
-        time_t end = time(0);
         da_cloud_header_free(&hhead);
         da_cloud_fini(&config);
 
-        printf("Time in sec: %ld\n", (end - start));
+        printf("Time with %d iterations (in sec): %4.4f\n", iterations, timetotal);
     }
 
     return (0);
