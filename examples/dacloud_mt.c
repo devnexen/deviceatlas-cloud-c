@@ -17,8 +17,8 @@ da_cloud_process_req(void *arg) {
     struct da_cloud_req *req = arg;
     printf("thread %d starts\n", req->tid);
     da_cloud_detect(&req->cfg, &req->head, &phead);
+    printf("thread %d ends from %s\n", req->tid, phead.cachesource);
     da_cloud_properties_free(&phead);
-    printf("thread %d ends\n", req->tid);
     return (NULL);
 }
 
