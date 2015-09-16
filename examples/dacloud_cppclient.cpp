@@ -28,7 +28,7 @@ main(int argc, char *argv[]) {
                     cout << p->value.l;
                     break;
                 case DA_CLOUD_BOOL:
-                    cout << p->value.l > 0 ? "true" : "false";
+                    cout << (p->value.l > 0 ? "true" : "false");
                     break;
                 case DA_CLOUD_STRING:
                     cout << p->value.s;
