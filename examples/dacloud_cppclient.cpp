@@ -39,8 +39,8 @@ main(int argc, char *argv[]) {
             da_cloud_properties_free(&phead);
         }
         da_cloud_header_free(&head);
-        da_cloud_fini(&config);
     }
 
+    da_cloud_fini(&config);
     return (0);
 }
