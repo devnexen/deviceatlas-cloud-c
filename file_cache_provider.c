@@ -30,7 +30,7 @@ int
 file_cache_init(struct da_cloud_cache_cfg *cfg) {
     struct stat s;
     cfg->cache_obj = NULL;
-    if (strlen(cfg->cache_cfg_str) >= (PATH_MAX - 74)) {
+    if (strlen(cfg->cache_cfg_str) >= (PATH_MAX - 67)) {
         fprintf(stderr, "directory '%s' too long\n", cfg->cache_cfg_str);
         return (-1);
     }
@@ -45,8 +45,7 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         fprintf(stderr, "could not allocated data structure\n");
         return (-1);
     }
-    strncpy(fcfg->dir, cfg->cache_cfg_str, sizeof(fcfg->dir));
-    fcfg->dir[sizeof(fcfg->dir) - 1] = 0;
+    strcpy(fcfg->dir, cfg->cache_cfg_str);
     fcfg->dirlen = strlen(fcfg->dir);
     cfg->cache_obj = fcfg;
     return (0);
