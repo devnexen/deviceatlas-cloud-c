@@ -78,14 +78,18 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
          if (cache == NULL)
              return (-1);
          memset(&s, 0, sizeof(s));
-         stat(fcfg->dir, &s);
+         cachefd = fileno(cache);
+         if (stat(fcfg->dir, &s) != 0) {
+             fclose(cache);
+             fprintf(stderr, "cannot stat '%s' file\n", fcfg->dir);
+             return (-1);
+         }
          if ((time_t)(s.st_mtime + cfg->expiration) <= time(NULL)) {
              fclose(cache);
              if (unlink(fcfg->dir) == - 1)
                  fprintf(stderr, "could not delete '%s' file\n", fcfg->dir);
              return (-1);
          }
-         cachefd = fileno(cache);
          if (flock(cachefd, LOCK_SH)  == -1) {
              fprintf(stderr, "could not lock the cache\n");
              fclose(cache);
