@@ -13,15 +13,21 @@ struct file_cache_cfg {
     char dir[PATH_MAX];
 };
 
+static void
+file_cache_setumask(mode_t *m) {
+    *m = umask(0);
+    umask(*m);
+}
+
 static
-void file_cache_mkdir(char *dir, size_t dirlen, const char *key) {
+void file_cache_mkdir(char *dir, size_t dirlen, const char *key, mode_t m) {
     struct stat s;
     memset(&s, 0, sizeof(s));
     dir[dirlen] = 0;
     strcat(dir, "/");
     strncat(dir, key, 1);
     if (stat(dir, &s) != 0)
-        mkdir(dir, 0777);
+        mkdir(dir, 0666 & ~m);
     strcat(dir, "/");
     strcat(dir, key + 1);    
 }
@@ -29,8 +35,14 @@ void file_cache_mkdir(char *dir, size_t dirlen, const char *key) {
 int
 file_cache_init(struct da_cloud_cache_cfg *cfg) {
     struct stat s;
+    size_t cache_cfg_strlen = strlen(cfg->cache_cfg_str);
+    mode_t m;
     cfg->cache_obj = NULL;
-    if (strlen(cfg->cache_cfg_str) >= (PATH_MAX - 67)) {
+    if (cache_cfg_strlen == 0) {
+        fprintf(stderr, "directory cannot be empty\n");
+        return (-1);
+    }
+    if (cache_cfg_strlen >= (PATH_MAX - 67)) {
         fprintf(stderr, "directory '%s' too long\n", cfg->cache_cfg_str);
         return (-1);
     }
@@ -47,7 +59,9 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
     }
     strcpy(fcfg->dir, cfg->cache_cfg_str);
     fcfg->dirlen = strlen(fcfg->dir);
+    file_cache_setumask(&m);
     cfg->cache_obj = fcfg;
+    cfg->data = &m;
     return (0);
 }
 
@@ -59,7 +73,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
          size_t valuelen;
          int cachefd = -1;
          struct file_cache_cfg *fcfg = cfg->cache_obj;
-         file_cache_mkdir(fcfg->dir, fcfg->dirlen, key);
+         file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, *((mode_t *)cfg->data));
          cache = fopen(fcfg->dir, "r");
          if (cache == NULL)
              return (-1);
@@ -97,7 +111,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          FILE *cache = NULL;
          int cachefd = -1;
          struct file_cache_cfg *fcfg = cfg->cache_obj;
-         file_cache_mkdir(fcfg->dir, fcfg->dirlen, key);
+         file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, *((mode_t *)cfg->data));
          cache = fopen(fcfg->dir, "w");
          if (cache == NULL)
              return (-1);
