@@ -19,13 +19,13 @@ main(int argc, char *argv[]) {
     memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath) == 0) {
         struct da_cloud_header_head hhead;
-        size_t i = 0;
         memset(&hhead, 0, sizeof(hhead));
         da_cloud_header_init(&hhead);
         da_cloud_header_add(&hhead, "user-agent", "iPhone");
         struct timeval start, end;
         double timetotal = 0.0;
         if (gettimeofday(&start, NULL) == 0) {
+            size_t i = 0;
             for (i = 0; i < iterations; i ++) {
                 struct da_cloud_property_head phead;
                 da_cloud_detect(&config, &hhead, &phead);
