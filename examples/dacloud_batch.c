@@ -29,10 +29,11 @@ print_properties(struct da_cloud_property_head phead) {
 
 int
 main(int argc, char *argv[]) {
+    struct da_cloud_config config;
+    const char *configpath;
     if (argc < 2)
         return (-1);
-    const char *configpath = argv[1];
-    struct da_cloud_config config;
+    configpath = argv[1];
     memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath) == 0) {
         struct da_cloud_header_head hhead;
@@ -42,9 +43,10 @@ main(int argc, char *argv[]) {
         for (i = 0; i < config.shead->nb; i ++)
             da_cloud_print_server(stderr, config.shead->servers[i]);
         while ((fgets(buf, sizeof(buf), stdin))) {
+            char *b;
             char *p = buf;
             while ((isspace(*p) || *p == '"') && p++);
-            char *b = strchr(p, '"');
+            b = strchr(p, '"');
             if (b == NULL)
                     b = strstr(p, "\r\n");
             if (b != NULL)

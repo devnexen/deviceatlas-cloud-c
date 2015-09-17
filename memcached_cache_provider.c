@@ -8,11 +8,12 @@
 
 int
 memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
+    memcached_server_st *servers;
     cfg->cache_obj = NULL;
     cfg->data = memcached_create(NULL);
     if (cfg->data == NULL)
         return (-1);
-    memcached_server_st *servers = memcached_servers_parse(cfg->cache_cfg_str);
+    servers = memcached_servers_parse(cfg->cache_cfg_str);
     memcached_server_push(cfg->data, servers);
     cfg->cache_obj = memcached_pool_create(cfg->data, 1, 5);
     memcached_server_free(servers);
