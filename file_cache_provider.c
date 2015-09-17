@@ -82,8 +82,10 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
          file_cache_setumask(&m);
          file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, m);
          cache = fopen(fcfg->dir, "r");
-         if (cache == NULL)
+         if (cache == NULL) {
+             pthread_mutex_unlock(&mtx);
              return (-1);
+         }
          memset(&s, 0, sizeof(s));
          cachefd = fileno(cache);
          if (stat(fcfg->dir, &s) != 0) {
@@ -124,6 +126,7 @@ int
 file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) {
     if (cfg->cache_obj != NULL) {
          FILE *cache = NULL;
+         struct stat s;
          pthread_mutex_t mtx;
          mode_t m;
          int cachefd = -1;
@@ -136,6 +139,9 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          pthread_mutex_lock(&mtx);
          file_cache_setumask(&m);
          file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, m);
+         memset(&s, 0, sizeof(s));
+         if (stat(fcfg->dir, &s) == 0)
+             return (0);
          cache = fopen(fcfg->dir, "w");
          if (cache == NULL) {
              pthread_mutex_unlock(&mtx);
