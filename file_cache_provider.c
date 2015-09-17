@@ -150,8 +150,11 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          file_cache_setumask(&m);
          file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, m);
          memset(&s, 0, sizeof(s));
-         if (stat(fcfg->dir, &s) == 0)
+         if (stat(fcfg->dir, &s) == 0) {
+             pthread_mutex_unlock(&mtx);
+             pthread_mutex_destroy(&mtx);
              return (0);
+         }
          cache = fopen(fcfg->dir, "w");
          if (cache == NULL) {
              pthread_mutex_unlock(&mtx);
