@@ -49,10 +49,14 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
     }
     memset(&s, 0, sizeof(s));
     stat(cfg->cache_cfg_str, &s);
-    if ((s.st_mode & S_IFMT) != S_IFDIR || !(s.st_mode & S_IWOTH)) {
+    if ((s.st_mode & S_IFMT) != S_IFDIR) {
         fprintf(stderr, "directory '%s' invalid\n", cfg->cache_cfg_str);
         return (-1);
+    } else if (!(s.st_mode & S_IWUSR) && !(s.st_mode & S_IWGRP) && !(s.st_mode & S_IWOTH)) {
+        fprintf(stderr, "directory '%s' permission denied\n", cfg->cache_cfg_str);
+        return (-1);
     }
+
     fcfg = malloc(sizeof(*fcfg));
     if (fcfg == NULL) {
         fprintf(stderr, "could not allocated data structure\n");
