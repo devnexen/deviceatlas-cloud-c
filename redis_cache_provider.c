@@ -75,6 +75,7 @@ redis_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         pthread_mutex_lock(&mtx);
         ret = redisCommand(cfg->cache_obj, "GET %s", key);
         pthread_mutex_unlock(&mtx);
+        pthread_mutex_destroy(&mtx);
         if (ret != NULL) {
             if (ret->str != NULL)
                 *value = strdup(ret->str);
@@ -98,6 +99,7 @@ redis_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *val
         pthread_mutex_lock(&mtx);
         ret = redisCommand(cfg->cache_obj, "SETEX %s %d %s", key, (int)cfg->expiration, value);
         pthread_mutex_unlock(&mtx);
+        pthread_mutex_destroy(&mtx);
         if (ret != NULL) {
             freeReplyObject(ret);
             return (0);

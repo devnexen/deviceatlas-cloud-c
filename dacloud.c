@@ -177,6 +177,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     if (nservers == 0)
         return (-1);
     curl_global_init(CURL_GLOBAL_NOTHING);
+    json_object_seed(0);
     return (_da_cloud_servers_fireup(config->shead));
 }
 
