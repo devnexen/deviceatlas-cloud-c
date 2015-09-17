@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <pthread.h>
 
 #include <hiredis/hiredis.h>
 
@@ -65,7 +66,15 @@ int
 redis_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
     if (cfg->cache_obj != NULL && value != NULL) {
         redisReply *ret;
+        pthread_mutex_t mtx;
+        if (pthread_mutex_init(&mtx, NULL) != 0) {
+            fprintf(stderr, "cannot lock the cache\n");
+            return (-1);
+        }
+
+        pthread_mutex_lock(&mtx);
         ret = redisCommand(cfg->cache_obj, "GET %s", key);
+        pthread_mutex_unlock(&mtx);
         if (ret != NULL) {
             if (ret->str != NULL)
                 *value = strdup(ret->str);
@@ -80,7 +89,15 @@ int
 redis_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) {
     if (cfg->cache_obj != NULL) {
         redisReply *ret;
+        pthread_mutex_t mtx;
+        if (pthread_mutex_init(&mtx, NULL) != 0) {
+            fprintf(stderr, "cannot lock the cache\n");
+            return (-1);
+        }
+
+        pthread_mutex_lock(&mtx);
         ret = redisCommand(cfg->cache_obj, "SETEX %s %d %s", key, (int)cfg->expiration, value);
+        pthread_mutex_unlock(&mtx);
         if (ret != NULL) {
             freeReplyObject(ret);
             return (0);
