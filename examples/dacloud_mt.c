@@ -3,7 +3,7 @@
 
 #include "dacloud.h"
 
-#define	THREADS		16
+#define	THREADS		10
 
 struct da_cloud_req {
     struct da_cloud_config cfg;
@@ -39,7 +39,8 @@ main(int argc, char *argv[]) {
     if (da_cloud_init(&config, configpath) == 0) {
         size_t i = 0;
         for (i = 0; i < THREADS; i ++) {
-            req[i].cfg = config;
+            memset(&req[i], 0, sizeof(req[i]));
+            memcpy(&req[i].cfg, &config, sizeof(req[i].cfg));
             req[i].tid = i;
             pthread_create(&pt[i], NULL, da_cloud_process_req, (void *) &req[i]);
         }
