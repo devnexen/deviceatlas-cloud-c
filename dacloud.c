@@ -310,6 +310,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     config->cops.get(&config->cache_cfg, cachekey, &cacheval);
     if (cacheval != NULL) {
         strcpy(phead->cachesource, "cache");
+        _ret = 0;
         goto jsoninit;
     }
 
