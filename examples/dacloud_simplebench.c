@@ -6,24 +6,25 @@
 
 int
 main(int argc, char *argv[]) {
+    struct da_cloud_config config;
+    const char *configpath;
+    int iterations = DEFAULT_ITERATIONS;
     if (argc < 2)
         return (-1);
-    int iterations = DEFAULT_ITERATIONS;
     if (argc >= 3) {
         int tmp = strtol(argv[2], 0, 10);
         if (tmp > 0)
             iterations = tmp;
     }
-    const char *configpath = argv[1];
-    struct da_cloud_config config;
+    configpath = argv[1];
     memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath) == 0) {
         struct da_cloud_header_head hhead;
+        struct timeval start, end;
+        double timetotal = 0.0;
         memset(&hhead, 0, sizeof(hhead));
         da_cloud_header_init(&hhead);
         da_cloud_header_add(&hhead, "user-agent", "iPhone");
-        struct timeval start, end;
-        double timetotal = 0.0;
         if (gettimeofday(&start, NULL) == 0) {
             size_t i = 0;
             for (i = 0; i < iterations; i ++) {

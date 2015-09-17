@@ -35,6 +35,7 @@ void file_cache_mkdir(char *dir, size_t dirlen, const char *key, mode_t m) {
 
 int
 file_cache_init(struct da_cloud_cache_cfg *cfg) {
+    struct file_cache_cfg *fcfg;
     struct stat s;
     size_t cache_cfg_strlen = strlen(cfg->cache_cfg_str);
     cfg->cache_obj = NULL;
@@ -52,7 +53,7 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         fprintf(stderr, "directory '%s' invalid\n", cfg->cache_cfg_str);
         return (-1);
     }
-    struct file_cache_cfg *fcfg = malloc(sizeof(*fcfg));
+    fcfg = malloc(sizeof(*fcfg));
     if (fcfg == NULL) {
         fprintf(stderr, "could not allocated data structure\n");
         return (-1);

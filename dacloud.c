@@ -56,10 +56,11 @@ int
 da_cloud_header_add(struct da_cloud_header_head *head,
         const char *key, const char *value) {
 #define  CLOUD_HEADER_PREFIX     "X-DA-"
+    size_t keylen;
     struct da_cloud_header *dh = malloc(sizeof(*dh));
     if (dh == NULL)
         return (-1);
-    size_t keylen = strlen(key) + sizeof(CLOUD_HEADER_PREFIX);
+    keylen = strlen(key) + sizeof(CLOUD_HEADER_PREFIX);
     dh->key = malloc(sizeof(char) * keylen + sizeof(CLOUD_HEADER_PREFIX) + 1);
     strncpy(dh->key, CLOUD_HEADER_PREFIX, sizeof(CLOUD_HEADER_PREFIX));
     strncat(dh->key, key, keylen);
@@ -98,6 +99,10 @@ da_cloud_properties_free(struct da_cloud_property_head *phead) {
 
 int
 da_cloud_init(struct da_cloud_config *config, const char *confpath) {
+    config_setting_t *servers, *server;
+    const char *licence_key, *cache_name, *cache_string;
+    config_t cfg;
+    size_t nservers;
     config->shead = calloc(1, sizeof(*config->shead));
     if (config->shead == NULL) {
         fprintf(stderr, "servers list allocation failed\n");
@@ -112,10 +117,9 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     config->cops.set = mock_cache_set;
     config->cops.fini = mock_cache_fini;
 
-    config_t cfg;
-    config_setting_t *servers, *server;
-    const char *licence_key, *cache_name = NULL, *cache_string = NULL;
-    size_t nservers = 0;
+    cache_name = NULL;
+    cache_string = NULL;
+    nservers = 0;
     config_init(&cfg);
     if (config_read_file(&cfg, confpath) != CONFIG_TRUE) {
         fprintf(stderr, "%s: invalid config file\n", confpath);
@@ -215,17 +219,18 @@ _da_cloud_servers_fireup(struct da_cloud_server_head *shead) {
     size_t i = 0 ;
     int _ret = -1;
     for (i = 0; i < shead->nb; i ++) {
+        long response_code;
+        CURLcode ret;
         CURL *c = curl_easy_init();
         if (c == NULL)
             return (-1);
         s = *(shead->servers + i);
-        long response_code;
         s->response_time = (double)-1;
         curl_easy_setopt(c, CURLOPT_URL, s->host);
         curl_easy_setopt(c, CURLOPT_PORT, (long)s->port);
         curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, _write_mock);
         curl_easy_setopt(c, CURLOPT_WRITEDATA, NULL);
-        CURLcode ret = curl_easy_perform(c);
+        ret = curl_easy_perform(c);
         if (ret == CURLE_OK) {
             curl_easy_getinfo(c, CURLINFO_RESPONSE_CODE, &response_code);
             if (response_code == 200) {
@@ -265,21 +270,26 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         struct da_cloud_property_head *phead) {
 #define  DETECT_URL_FORMAT "%s:%d/v1/detect/properties?licenceKey=%s"
 #define  DETECT_HDR_FORMAT "%s: %s"
+    struct da_cloud_server *s;
+    struct da_cloud_header *h;
+    struct curl_slist *hd;
+    char *cacheval;
+    char cachekeybuf[1024], cachekey[65];
+    json_t *response;
+    json_error_t err;
+    CURL *c;
+    size_t i;
+    int _ret;
     if (phead == NULL) {
         fprintf(stderr, "properties cannot be null\n");
         return (-1);
     }
 
-    CURL *c = NULL;
-    struct da_cloud_server *s;
-    struct da_cloud_header *h;
-    struct curl_slist *hd = NULL;
-    json_error_t err;
-    json_t *response = NULL;
-    char *cacheval = NULL;
-    char cachekeybuf[1024] = { 0 }, cachekey[65] = { 0 };
-    size_t i;
-    int _ret = -1;
+    hd = NULL;
+    c = NULL;
+    response = NULL;
+    cacheval = NULL;
+    _ret = -1;
     strcpy(phead->cachesource, "none");
     SLIST_INIT(&phead->list);
 

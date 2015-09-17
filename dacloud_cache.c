@@ -9,11 +9,12 @@ void
 da_cloud_crypt_key(char *source, size_t sourcelen, char *result, size_t resultlen) {
     SHA256_CTX ctx;
     u_int8_t digest[SHA256_DIGEST_LENGTH];
+    u_int8_t *p;
     static u_int8_t a[] = "0123456789abcdef";
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, source, sourcelen);
     SHA256_Final(digest, &ctx);
-    u_int8_t *p = digest;
+    p = digest;
 
     resultlen /= 2;
     while (resultlen --) {
