@@ -274,12 +274,12 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     struct da_cloud_header *h;
     struct curl_slist *hd;
     char *cacheval;
-    char cachekeybuf[1024], cachekey[65];
     json_t *response;
     json_error_t err;
     CURL *c;
     size_t i;
     int _ret;
+    char cachekeybuf[1024] = { 0 }, cachekey[65] = { 0 };
     if (phead == NULL) {
         fprintf(stderr, "properties cannot be null\n");
         return (-1);

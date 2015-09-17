@@ -1,6 +1,7 @@
 #ifdef   HAVE_HIREDIS
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include <hiredis/hiredis.h>
 
