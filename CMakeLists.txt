@@ -58,5 +58,6 @@ file(GLOB SRCS *.c)
 include_directories(${HAVE_CURL})
 add_library(dacloud ${LIBTYPE} ${SRCS})
 target_link_libraries(dacloud ${CONFIG} ${CURL} ${JANSSON} ${CRYPTO} ${CACHELIBS})
+set_target_properties(dacloud PROPERTIES SOVERSION 1.0)
 
 subdirs(examples)
