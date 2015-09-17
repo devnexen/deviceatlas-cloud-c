@@ -280,6 +280,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     char cachekeybuf[1024] = { 0 }, cachekey[65] = { 0 };
     size_t i;
     int _ret = -1;
+    strcpy(phead->cachesource, "none");
     SLIST_INIT(&phead->list);
 
     SLIST_FOREACH(h, &head->list, entries) {
