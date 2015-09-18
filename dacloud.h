@@ -33,7 +33,8 @@ void da_cloud_header_free(struct da_cloud_header_head *);
 enum da_cloud_property_type {
     DA_CLOUD_LONG,
     DA_CLOUD_BOOL,
-    DA_CLOUD_STRING
+    DA_CLOUD_STRING,
+    DA_CLOUD_UNKNOWN = 16
 };
 
 /**

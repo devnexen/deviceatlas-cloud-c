@@ -405,7 +405,6 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
 
             switch (type) {
                 case JSON_STRING:
-                default:
                     p->type = DA_CLOUD_STRING;
                     p->value.s = strdup(json_string_value(value));
                     break;
@@ -420,6 +419,9 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
                 case JSON_INTEGER:
                     p->type = DA_CLOUD_LONG;
                     p->value.l = json_integer_value(value);
+                    break;
+                default:
+                    p->type = DA_CLOUD_UNKNOWN;
                     break;
             }
 
