@@ -68,7 +68,7 @@ redis_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         redisReply *ret;
         pthread_mutex_t mtx;
         if (pthread_mutex_init(&mtx, NULL) != 0) {
-            fprintf(stderr, "cannot lock the cache\n");
+            fprintf(cfg->efp, "cannot lock the cache\n");
             return (-1);
         }
 
@@ -92,7 +92,7 @@ redis_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *val
         redisReply *ret;
         pthread_mutex_t mtx;
         if (pthread_mutex_init(&mtx, NULL) != 0) {
-            fprintf(stderr, "cannot lock the cache\n");
+            fprintf(cfg->efp, "cannot lock the cache\n");
             return (-1);
         }
 
@@ -104,7 +104,7 @@ redis_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *val
             freeReplyObject(ret);
             return (0);
         } else {
-            fprintf(stderr, "could not set cache: %s\n", ((redisContext *)cfg->cache_obj)->errstr);
+            fprintf(cfg->efp, "could not set cache: %s\n", ((redisContext *)cfg->cache_obj)->errstr);
         }
     }
 
