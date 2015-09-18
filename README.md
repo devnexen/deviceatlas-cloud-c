@@ -8,8 +8,8 @@ https://deviceatlas.com/resources/getting-started-cloud
 
 A local cache handler can be used to avoid using Cloud service hits with a same request.
 
-- At the moment a simple disk, memcached and redis cache solutions are supported.
-- 3 samples configuration files for each cache support are provided.
+- At the moment a simple disk and memcached cache solutions are supported.
+- 2 samples configuration files for each cache support are provided.
 - 3 examples which represents sort of use cases, batch, multi thread and a simple one for pure speed benchmarking.
 - A new cache handler can be written via the cache's provider interface as long as the library used is multi thread safe.
 
@@ -32,4 +32,3 @@ a/ Mandatories
 b/ Optional
 
 * LibMemcached (works with old 0.4.x versions as well).
-* LibHiRedis.
