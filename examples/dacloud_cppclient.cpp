@@ -31,6 +31,7 @@ main(int argc, char *argv[]) {
                     cout << (p->value.l > 0 ? "true" : "false");
                     break;
                 case DA_CLOUD_STRING:
+                case DA_CLOUD_UNKNOWN:
                     cout << p->value.s;
                     break;
                 }
