@@ -40,26 +40,26 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
     size_t cache_cfg_strlen = strlen(cfg->cache_cfg_str);
     cfg->cache_obj = NULL;
     if (cache_cfg_strlen == 0) {
-        fprintf(stderr, "directory cannot be empty\n");
+        fprintf(cfg->efp, "directory cannot be empty\n");
         return (-1);
     }
     if (cache_cfg_strlen >= (PATH_MAX - 67)) {
-        fprintf(stderr, "directory '%s' too long\n", cfg->cache_cfg_str);
+        fprintf(cfg->efp, "directory '%s' too long\n", cfg->cache_cfg_str);
         return (-1);
     }
     memset(&s, 0, sizeof(s));
     stat(cfg->cache_cfg_str, &s);
     if ((s.st_mode & S_IFMT) != S_IFDIR) {
-        fprintf(stderr, "directory '%s' invalid\n", cfg->cache_cfg_str);
+        fprintf(cfg->efp, "directory '%s' invalid\n", cfg->cache_cfg_str);
         return (-1);
     } else if (!(s.st_mode & S_IWUSR) && !(s.st_mode & S_IWGRP) && !(s.st_mode & S_IWOTH)) {
-        fprintf(stderr, "directory '%s' permission denied\n", cfg->cache_cfg_str);
+        fprintf(cfg->efp, "directory '%s' permission denied\n", cfg->cache_cfg_str);
         return (-1);
     }
 
     fcfg = malloc(sizeof(*fcfg));
     if (fcfg == NULL) {
-        fprintf(stderr, "could not allocated data structure\n");
+        fprintf(cfg->efp, "could not allocated data structure\n");
         return (-1);
     }
     strcpy(fcfg->dir, cfg->cache_cfg_str);
@@ -79,7 +79,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
          int cachefd = -1;
          struct file_cache_cfg *fcfg = cfg->cache_obj;
          if (pthread_mutex_init(&mtx, NULL) != 0) {
-             fprintf(stderr, "could not lock\n");
+             fprintf(cfg->efp, "could not lock\n");
              return (-1);
          }
          
@@ -98,7 +98,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
              fclose(cache);
              pthread_mutex_unlock(&mtx);
              pthread_mutex_destroy(&mtx);
-             fprintf(stderr, "cannot stat '%s' file\n", fcfg->dir);
+             fprintf(cfg->efp, "cannot stat '%s' file\n", fcfg->dir);
              return (-1);
          }
          if ((time_t)(s.st_mtime + cfg->expiration) <= time(NULL)) {
@@ -106,14 +106,14 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
              pthread_mutex_unlock(&mtx);
              pthread_mutex_destroy(&mtx);
              if (unlink(fcfg->dir) == - 1)
-                 fprintf(stderr, "could not delete '%s' file\n", fcfg->dir);
+                 fprintf(cfg->efp, "could not delete '%s' file\n", fcfg->dir);
              return (-1);
          }
          if (flock(cachefd, LOCK_SH)  == -1) {
              fclose(cache);
              pthread_mutex_unlock(&mtx);
              pthread_mutex_destroy(&mtx);
-             fprintf(stderr, "could not lock the cache\n");
+             fprintf(cfg->efp, "could not lock the cache\n");
              return (-1);
          }
          fseek(cache, 0, SEEK_END);
@@ -142,7 +142,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          int cachefd = -1;
          struct file_cache_cfg *fcfg = cfg->cache_obj;
          if (pthread_mutex_init(&mtx, NULL) != 0) {
-             fprintf(stderr, "could not lock\n");
+             fprintf(cfg->efp, "could not lock\n");
              return (-1);
          }
          
@@ -159,14 +159,14 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          if (cache == NULL) {
              pthread_mutex_unlock(&mtx);
              pthread_mutex_destroy(&mtx);
-             fprintf(stderr, "could not open cache for writing\n");
+             fprintf(cfg->efp, "could not open cache for writing\n");
              return (-1);
          }
          cachefd = fileno(cache);
          if (flock(cachefd, LOCK_EX) == -1) {
              pthread_mutex_unlock(&mtx);
              pthread_mutex_destroy(&mtx);
-             fprintf(stderr, "could not lock the cache\n");
+             fprintf(cfg->efp, "could not lock the cache\n");
              fclose(cache);
              return (-1);
          }
@@ -174,7 +174,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          flock(cachefd, LOCK_UN);
          fclose(cache);
          pthread_mutex_unlock(&mtx);
-	 pthread_mutex_destroy(&mtx);
+         pthread_mutex_destroy(&mtx);
          return (0);
     }
 

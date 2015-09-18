@@ -78,6 +78,7 @@ struct da_cloud_config {
     struct da_cloud_cache_cfg cache_cfg;
     struct da_cloud_cache_ops cops;
     struct da_cloud_server_head *shead;
+    FILE *efp;
     char *licence_key;
 };
 

@@ -2,10 +2,12 @@
 #define  DACLOUD_CACHE_H
 
 #include <time.h>
+#include <stdio.h>
 
 struct da_cloud_cache_cfg {
     void *data;
     void *cache_obj;
+    FILE *efp;
     char *cache_cfg_str;
     size_t expiration;
 };
