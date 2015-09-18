@@ -243,7 +243,10 @@ _da_cloud_servers_fireup(struct da_cloud_server_head *shead) {
         curl_easy_cleanup(c);
     }
 
-    qsort(shead->servers, shead->nb, sizeof(*shead->servers), _servers_cmp);
+    if (_ret == 0)
+        qsort(shead->servers, shead->nb, sizeof(*shead->servers), _servers_cmp);
+    else
+        fprintf(stderr, "no servers available\n");
     return (_ret);
 }
 
