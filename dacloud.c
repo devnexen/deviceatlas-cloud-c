@@ -362,7 +362,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         if (ret == CURLE_OK) {
             *(dr->buf + dr->buflen) = 0;
             if (*dr->buf != '{') {
-                fprintf(config->efp, "invalid json: %s\n", dr->buf);
+                fprintf(config->efp, "error:\n%s\n", dr->buf);
                 data_reader_free(dr);
                 curl_slist_free_all(hd);
                 curl_easy_cleanup(c);
