@@ -35,6 +35,7 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
             fprintf(fp, "%s", (p->value.l > 0 ? "true" : "false"));
             break;
         case DA_CLOUD_STRING:
+        case DA_CLOUD_UNKNOWN:
             fprintf(fp, "%s", p->value.s);
             break;
         default:
@@ -87,7 +88,7 @@ da_cloud_properties_free(struct da_cloud_property_head *phead) {
     struct da_cloud_property *p = SLIST_FIRST(&phead->list);
     while (!SLIST_EMPTY(&phead->list)) {
         SLIST_REMOVE_HEAD(&phead->list, entries);
-        if (p->type == DA_CLOUD_STRING)
+        if (p->type == DA_CLOUD_STRING || p->type == DA_CLOUD_UNKNOWN)
             free(p->value.s);
         free(p->name);
         free(p);
@@ -423,6 +424,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
                     break;
                 default:
                     p->type = DA_CLOUD_UNKNOWN;
+                    p->value.s = strdup("(unknown)");
                     break;
             }
 
