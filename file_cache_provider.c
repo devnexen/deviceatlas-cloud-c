@@ -103,7 +103,6 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
              fclose(cache);
              pthread_mutex_unlock(&mtx);
              pthread_mutex_destroy(&mtx);
-             fprintf(cfg->efp, "cannot stat '%s' file\n", fcfg->dir);
              return (-1);
          }
          if ((time_t)(s.st_mtime + cfg->expiration) <= time(NULL)) {
