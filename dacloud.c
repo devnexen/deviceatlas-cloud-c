@@ -46,6 +46,24 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
     }
 }
 
+void
+da_cloud_log(FILE *fp, const char *fmt, ...) {
+    if (fp != NULL) {
+        va_list args;
+        va_start(args, fmt);
+        time_t now = time(NULL);
+        char strnow[26];
+        if (ctime_r(&now, strnow) != NULL) {
+            strnow[sizeof(strnow) - 2] = 0;
+            fprintf(fp, "[%s]: ", strnow);
+            vfprintf(fp, fmt, args);
+            fprintf(fp, "\n");
+        }
+
+        va_end(args);
+    }
+}
+
 int
 da_cloud_header_init(struct da_cloud_header_head *head)
 {
@@ -107,7 +125,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     config->efp = stderr;
     config->shead = calloc(1, sizeof(*config->shead));
     if (config->shead == NULL) {
-        fprintf(config->efp, "servers list allocation failed\n");
+        da_cloud_log(config->efp, "servers list allocation failed", NULL);
         return (-1);
     }
 
@@ -127,7 +145,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     nservers = 0;
     config_init(&cfg);
     if (config_read_file(&cfg, confpath) != CONFIG_TRUE) {
-        fprintf(config->efp, "%s: invalid config file\n", confpath);
+        da_cloud_log(config->efp, "%s: invalid config file", confpath, NULL);
         return (-1);
     }
     if (config_lookup_string(&cfg, "user.error_path", &error_path) == CONFIG_TRUE) {
@@ -144,13 +162,13 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
 
     config->cache_cfg.efp = config->efp;
     if (config_lookup_string(&cfg, "user.licence_key", &licence_key) != CONFIG_TRUE) {
-        fprintf(config->efp, "%s: could not find user.licence_key value\n", confpath);
+        da_cloud_log(config->efp, "%s: could not find user.licence_key value", confpath, NULL);
     } else {
         config_lookup_string(&cfg, "user.cache.type", &cache_name);
         config_lookup_string(&cfg, "user.cache.config", &cache_string);
     }
     if ((servers = config_lookup(&cfg, "servers")) == NULL) {
-        fprintf(config->efp, "%s: could not find servers config\n", confpath);
+        da_cloud_log(config->efp, "%s: could not find servers config", confpath, NULL);
         config_destroy(&cfg);
         return (-1);
     }
@@ -162,8 +180,8 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         cache_set(&config->cops, cache_name);
         if (config->cops.init(&config->cache_cfg) == -1) {
             free(config->cache_cfg.cache_cfg_str);
-            fprintf(config->efp, "could not set %s cache\n", cache_name);
             config_destroy(&cfg);
+            da_cloud_log(config->efp, "could not set %s cache", cache_name);
             return (-1);
         }
         free(config->cache_cfg.cache_cfg_str);
@@ -175,7 +193,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         int tmp;
         unsigned short port = 80;
         if (config_setting_lookup_string(server, "host", &host) != CONFIG_TRUE) {
-            fprintf(config->efp, "%s: did not find host setting (%d)\n", confpath, (int)nservers);
+            da_cloud_log(config->efp, "%s: did not find host setting (%d)", confpath, (int)nservers, NULL);
             continue;
         }
         if (config_setting_lookup_int(server, "port", &tmp) == CONFIG_TRUE) {
@@ -302,7 +320,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     int _ret;
     char cachekeybuf[1024] = { 0 }, cachekey[65] = { 0 };
     if (phead == NULL) {
-        fprintf(config->efp, "properties cannot be null\n");
+        da_cloud_log(config->efp, "properties cannot be null", NULL);
         return (-1);
     }
 
@@ -363,7 +381,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         if (ret == CURLE_OK) {
             *(dr->buf + dr->buflen) = 0;
             if (*dr->buf != '{') {
-                fprintf(config->efp, "error:\n%s\n", dr->buf);
+                da_cloud_log(config->efp, "error:\n%s", dr->buf, NULL);
                 data_reader_free(dr);
                 curl_slist_free_all(hd);
                 curl_easy_cleanup(c);
@@ -371,7 +389,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
             }
 
             if (config->cops.set(&config->cache_cfg, cachekey, dr->buf) == -1)
-                fprintf(config->efp, "could not cache %s\n", cachekey);
+                da_cloud_log(config->efp, "could not cache %s", cachekey, NULL);
 
             cacheval = strdup(dr->buf);
             strcpy(phead->cachesource, "cloud");
@@ -393,8 +411,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         goto fcache;
     response = json_loads(cacheval, JSON_PRESERVE_ORDER, &err);
     if (strlen(err.text) > 0) {
-        fprintf(config->efp, "response: %s\n", err.text);
-        fprintf(config->efp, "got:\n%s\n", cacheval);
+        da_cloud_log(config->efp, "response: %s", err.text, NULL);
+        da_cloud_log(config->efp, "got:\n%s", cacheval, NULL);
     } else {
         json_t *properties = json_object_get(response, "properties");
         void *it = json_object_iter(properties);
