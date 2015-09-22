@@ -29,6 +29,8 @@ void mock_cache_fini(struct da_cloud_cache_cfg *);
 
 void cache_set(struct da_cloud_cache_ops *, const char *);
 
+void da_cloud_log(FILE *, const char *, ...);
+
 #include "cache_providers.h"
 
 #endif
