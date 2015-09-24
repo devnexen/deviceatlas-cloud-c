@@ -54,7 +54,9 @@ da_cloud_log(FILE *fp, const char *fmt, ...) {
         time_t now = time(NULL);
         char strnow[26];
         if (ctime_r(&now, strnow) != NULL) {
-            strnow[sizeof(strnow) - 2] = 0;
+            char *str = strchr(strnow, '\n');
+	    if (str)
+		*str++ = 0;
             fprintf(fp, "[%s]: ", strnow);
             vfprintf(fp, fmt, args);
             fprintf(fp, "\n");
