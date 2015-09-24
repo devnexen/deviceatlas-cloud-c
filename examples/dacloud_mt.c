@@ -3,7 +3,7 @@
 
 #include "dacloud.h"
 
-#define	THREADS		10
+#define	THREADS		128
 
 struct da_cloud_req {
     struct da_cloud_config cfg;
