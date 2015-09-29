@@ -43,10 +43,12 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         da_cloud_log(cfg->efp, "directory cannot be empty", NULL);
         return (-1);
     }
+
     if (cache_cfg_strlen >= (PATH_MAX - 67)) {
         da_cloud_log(cfg->efp, "directory '%s' too long", cfg->cache_cfg_str, NULL);
         return (-1);
     }
+
     memset(&s, 0, sizeof(s));
     stat(cfg->cache_cfg_str, &s);
     if ((s.st_mode & S_IFMT) != S_IFDIR) {
@@ -62,9 +64,11 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         da_cloud_log(cfg->efp, "could not allocate data structure", NULL);
         return (-1);
     }
+
     strcpy(fcfg->dir, cfg->cache_cfg_str);
     fcfg->dirlen = strlen(fcfg->dir);
     cfg->cache_obj = fcfg;
+
     return (0);
 }
 
