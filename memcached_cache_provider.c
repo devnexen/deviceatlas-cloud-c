@@ -15,10 +15,12 @@ memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
         da_cloud_log(cfg->efp, "could not allocated data structure");
         return (-1);
     }
+
     servers = memcached_servers_parse(cfg->cache_cfg_str);
     memcached_server_push(cfg->data, servers);
     cfg->cache_obj = memcached_pool_create(cfg->data, 1, 5);
     memcached_server_free(servers);
+
     return (0);
 }
 
