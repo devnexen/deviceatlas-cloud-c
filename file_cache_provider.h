@@ -16,6 +16,8 @@
  *  License along with this library.
  */
 
+#ifndef  FILE_CACHE_PROVIDER_H
+#define  FILE_CACHE_PROVIDER_H
 #include "dacloud_cache.h"
 
 int file_cache_init(struct da_cloud_cache_cfg *);
