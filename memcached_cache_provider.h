@@ -16,6 +16,9 @@
  *  License along with this library.
  */
 
+#ifdef   HAVE_MEMCACHED
+#ifndef  MEMCACHED_PROVIDER_H
+#define  MEMCACHED_PROVIDER_H
 #include "dacloud_cache.h"
 
 int memcached_cache_init(struct da_cloud_cache_cfg *);
