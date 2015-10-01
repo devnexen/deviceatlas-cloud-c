@@ -41,13 +41,11 @@ void
 cache_set(struct da_cloud_cache_ops *cops, const char *cache_name) {
     if (strcasecmp(cache_name, "file") == 0) {
         CACHE_SET(cops, file);
-    }
-
-    if (strcasecmp(cache_name, "memcached") == 0) {
 #ifdef	HAVE_MEMCACHED
+    } else if (strcasecmp(cache_name, "memcached") == 0) {
         CACHE_SET(cops, memcached);
-#else
-        errx(1, "no memcached support enabled");
 #endif
+    } else {
+        errx(1, "%s cache invalid", cache_name);
     }
 }
