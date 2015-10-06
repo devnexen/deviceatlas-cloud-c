@@ -102,8 +102,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
              da_cloud_log(cfg->efp, "could not create dir '%s'", fcfg->dir);
              return (-1);
          }
-         pthread_mutex_unlock(&mtx);
-         pthread_mutex_lock(&mtx);
+
          while ((cache = fopen(fcfg->dir, "r")) == NULL) {
              sleep(1);
              ++ i;
@@ -164,7 +163,6 @@ int
 file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) {
     if (cfg->cache_obj != NULL) {
          FILE *cache = NULL;
-         struct stat s;
          pthread_mutex_t mtx;
          size_t i = 0;
          mode_t m;
@@ -182,14 +180,6 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
              pthread_mutex_destroy(&mtx);
              da_cloud_log(cfg->efp, "could not create dir '%s'", fcfg->dir);
              return (-1);
-         }
-         pthread_mutex_unlock(&mtx);
-         pthread_mutex_lock(&mtx);
-         memset(&s, 0, sizeof(s));
-         if (stat(fcfg->dir, &s) == 0) {
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             return (0);
          }
 
          while ((cache = fopen(fcfg->dir, "w")) == NULL) {
