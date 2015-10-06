@@ -419,7 +419,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     curl_easy_cleanup(c);
 
  jsoninit:
-    if (strlen(cacheval) == 0)
+    if (cacheval != NULL && strlen(cacheval) == 0)
         goto fcache;
     response = json_loads(cacheval, JSON_PRESERVE_ORDER, &err);
     if (strlen(err.text) > 0) {
