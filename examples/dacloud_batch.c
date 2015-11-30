@@ -10,7 +10,7 @@ print_headers(struct da_cloud_header_head hhead) {
     struct da_cloud_header *h;
     printf("\nHeaders used:\n");
     SLIST_FOREACH(h, &hhead.list, entries) {
-        printf("%s => %s\n", h->key, h->value);
+        printf("%s => %s\n", h->key + (sizeof("X-DA-") - 1), h->value);
     }
     printf("\n");
 }

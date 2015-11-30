@@ -52,13 +52,17 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
 void
 da_cloud_log(FILE *fp, const char *fmt, ...) {
     if (fp != NULL) {
+        time_t now;
+        char strnow[26];
         va_list args;
         va_start(args, fmt);
-        time_t now = time(NULL);
-        char strnow[26];
+
+        now = time(NULL);
         if (ctime_r(&now, strnow) != NULL) {
-            strnow[sizeof(strnow) - 2] = 0;
-            fprintf(fp, "[%s / pid %d]: ", strnow, getpid());
+            char *str = strchr(strnow, '\n');
+            if (str)
+                *str++ = 0;
+            fprintf(fp, "[%s]: ", strnow);
             vfprintf(fp, fmt, args);
             fprintf(fp, "\n");
         }
@@ -71,6 +75,7 @@ int
 da_cloud_header_init(struct da_cloud_header_head *head)
 {
     SLIST_INIT(&head->list);
+
     return (0);
 }
 
@@ -89,6 +94,7 @@ da_cloud_header_add(struct da_cloud_header_head *head,
     *(dh->key + keylen) = 0;
     dh->value = strdup(value);
     SLIST_INSERT_HEAD(&head->list, dh, entries);
+
     return (0);
 }
 
@@ -151,6 +157,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         da_cloud_log(config->efp, "%s: invalid config file", confpath, NULL);
         return (-1);
     }
+
     if (config_lookup_string(&cfg, "user.error_path", &error_path) == CONFIG_TRUE) {
         if (strcmp(error_path, "stdin") == 0 || strcmp(error_path, "2") == 0) {
             config->efp = stdin;
@@ -170,6 +177,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         config_lookup_string(&cfg, "user.cache.type", &cache_name);
         config_lookup_string(&cfg, "user.cache.config", &cache_string);
     }
+
     if ((servers = config_lookup(&cfg, "servers")) == NULL) {
         da_cloud_log(config->efp, "%s: could not find servers config", confpath, NULL);
         config_destroy(&cfg);
@@ -187,6 +195,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
             da_cloud_log(config->efp, "could not set %s cache", cache_name);
             return (-1);
         }
+
         free(config->cache_cfg.cache_cfg_str);
     }
 
@@ -215,7 +224,9 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     config_destroy(&cfg);
     if (nservers == 0)
         return (-1);
+
     curl_global_init(CURL_GLOBAL_NOTHING);
+
     return (_da_cloud_servers_fireup(config->shead));
 }
 
@@ -249,6 +260,8 @@ data_reader_free(struct data_reader *dr) {
 
 static size_t
 _write_mock(char *p, size_t size, size_t nb, void *arg) {
+    (void)p;
+    (void)arg;
     return (size * nb);
 }
 
@@ -278,6 +291,7 @@ _da_cloud_servers_fireup(struct da_cloud_server_head *shead) {
                     _ret = 0;
             }
         }
+
         curl_easy_cleanup(c);
     }
 
@@ -285,6 +299,7 @@ _da_cloud_servers_fireup(struct da_cloud_server_head *shead) {
         qsort(shead->servers, shead->nb, sizeof(*shead->servers), _servers_cmp);
     else
         fprintf(stderr, "no servers available\n");
+
     return (_ret);
 }
 
@@ -304,6 +319,7 @@ _write_servers_response(char *data, size_t size, size_t nb, void *arg) {
     }
 
     dr->buflen += total;
+
     return (total);
 }
 
@@ -410,7 +426,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     curl_easy_cleanup(c);
 
  jsoninit:
-    if (strlen(cacheval) == 0)
+    if (cacheval != NULL && strlen(cacheval) == 0)
         goto fcache;
     response = json_loads(cacheval, JSON_PRESERVE_ORDER, &err);
     if (strlen(err.text) > 0) {
