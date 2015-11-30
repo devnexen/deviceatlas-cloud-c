@@ -4,6 +4,9 @@
 #include <libconfig.h>
 #include <jansson.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "dacloud.h"
 
 #ifndef	__DBL_EPSILON
@@ -49,14 +52,16 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
 void
 da_cloud_log(FILE *fp, const char *fmt, ...) {
     if (fp != NULL) {
+        time_t now;
+        char strnow[26];
         va_list args;
         va_start(args, fmt);
-        time_t now = time(NULL);
-        char strnow[26];
+
+        now = time(NULL);
         if (ctime_r(&now, strnow) != NULL) {
             char *str = strchr(strnow, '\n');
-	    if (str)
-		*str++ = 0;
+            if (str)
+                *str++ = 0;
             fprintf(fp, "[%s]: ", strnow);
             vfprintf(fp, fmt, args);
             fprintf(fp, "\n");
@@ -255,6 +260,8 @@ data_reader_free(struct data_reader *dr) {
 
 static size_t
 _write_mock(char *p, size_t size, size_t nb, void *arg) {
+    (void)p;
+    (void)arg;
     return (size * nb);
 }
 
