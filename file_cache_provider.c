@@ -20,17 +20,25 @@ file_cache_setumask(mode_t *m) {
     umask(*m);
 }
 
-static
-void file_cache_mkdir(char *dir, size_t dirlen, const char *key, mode_t m) {
+static int
+file_cache_mkdir(char *dir, size_t dirlen, const char *key, int creat, mode_t m) {
     struct stat s;
     memset(&s, 0, sizeof(s));
     dir[dirlen] = 0;
     strcat(dir, "/");
     strncat(dir, key, 1);
-    if (stat(dir, &s) != 0)
-        mkdir(dir, 0777 & ~m);
+    if (stat(dir, &s) != 0) {
+        if (creat) {
+            if (mkdir(dir, 0777 & ~m) != 0)
+                return (-1);
+        } else {
+            return (-1);
+        }
+    }
     strcat(dir, "/");
     strcat(dir, key + 1);    
+
+    return (0);
 }
 
 int
@@ -85,7 +93,11 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
          
          pthread_mutex_lock(&mtx);
          file_cache_setumask(&m);
-         file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, m);
+         if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 0, m) == -1) {
+             pthread_mutex_unlock(&mtx);
+             pthread_mutex_destroy(&mtx);
+             return (-1);
+         }
          while ((cache = fopen(fcfg->dir, "r")) == NULL) {
              sleep(1);
              ++ i;
@@ -153,7 +165,11 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          
          pthread_mutex_lock(&mtx);
          file_cache_setumask(&m);
-         file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, m);
+         if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 1, m) == -1) {
+             pthread_mutex_unlock(&mtx);
+             pthread_mutex_destroy(&mtx);
+             return (-1);
+         }
          memset(&s, 0, sizeof(s));
          if (stat(fcfg->dir, &s) == 0) {
              pthread_mutex_unlock(&mtx);

@@ -4,6 +4,9 @@
 #include <libconfig.h>
 #include <jansson.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "dacloud.h"
 
 #ifndef	__DBL_EPSILON
@@ -55,7 +58,7 @@ da_cloud_log(FILE *fp, const char *fmt, ...) {
         char strnow[26];
         if (ctime_r(&now, strnow) != NULL) {
             strnow[sizeof(strnow) - 2] = 0;
-            fprintf(fp, "[%s]: ", strnow);
+            fprintf(fp, "[%s / pid %d]: ", strnow, getpid());
             vfprintf(fp, fmt, args);
             fprintf(fp, "\n");
         }
