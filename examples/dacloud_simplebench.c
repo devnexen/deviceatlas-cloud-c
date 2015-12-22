@@ -26,7 +26,7 @@ main(int argc, char *argv[]) {
         da_cloud_header_init(&hhead);
         da_cloud_header_add(&hhead, "user-agent", "iPhone");
         if (gettimeofday(&start, NULL) == 0) {
-            size_t i = 0;
+            int i = 0;
             for (i = 0; i < iterations; i ++) {
                 struct da_cloud_property_head phead;
                 da_cloud_detect(&config, &hhead, &phead);
