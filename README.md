@@ -32,3 +32,11 @@ a/ Mandatories
 b/ Optional
 
 * LibMemcached (works with old 0.4.x versions as well).
+
+3/ Examples
+===========
+
+- batch       : examples/dacloud_batch <configuration file path> < <file of user agents> (N.B: a sample batch file can be found inside examples folder)
+- C++         : examples/dacloud_cppclient <configuration file path> <user-agent>
+- MultiThread : examples/dacloud_mt <configuration file path>
+- Benchmark   : examples/dacloud_simplebench <configuration file path> [<number of iterations, per default 1000>]
