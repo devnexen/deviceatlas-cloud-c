@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
 # mandatory libraries
-find_path(HAVE_SYS_QUEUE sys/queue.h REQUIRED)
 find_path(HAVE_CONFIG libconfig.h)
 find_path(HAVE_CURL curl/curl.h)
 find_path(HAVE_JANSSON jansson.h)
