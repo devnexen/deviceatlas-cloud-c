@@ -39,7 +39,7 @@ if (NOT LIBTYPE)
     set(LIBTYPE SHARED)	
 endif()
 
-message(STATUS "${LIBTYPE} library version")
+message(STATUS "${LIBTYPE} version")
 
 file(GLOB SRCS *.c)
 include_directories(${HAVE_CURL})
