@@ -3,4 +3,4 @@ compiler:
 - gcc
 - clang
 
-script: cmake
+script: cmake -DCMAKE_C_FLAGS="-Wall"
