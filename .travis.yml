@@ -4,6 +4,7 @@ compiler:
 - clang
 
 before_install:
+- sudo apt-get -qq update
 - sudo apt-get install libconfig-dev
 - sudo apt-get install libjansson-dev
 - sudo apt-get install libmemcached-dev
