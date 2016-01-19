@@ -9,6 +9,4 @@ before_install:
 - sudo apt-get install libjansson-dev
 - sudo apt-get install libmemcached-dev
 
-script:
-- cmake -DCMAKE_C_FLAGS="-Wall"
-- make
+script: cmake -DCMAKE_C_FLAGS="-Wall" && make
