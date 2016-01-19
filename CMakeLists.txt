@@ -10,10 +10,6 @@ find_path(HAVE_MEMCACHED libmemcached/memcached.h)
 
 set(CACHELIBS "")
 
-if (${HAVE_SYS_QUEUE} STREQUAL "HAVE_SYS_QUEUE-NOTFOUND")
-    message(FATAL_ERROR "Requires sys/queue.h")
-endif()
-
 if (${HAVE_CONFIG} STREQUAL "HAVE_CONFIG-NOTFOUND")
     message(FATAL_ERROR "Requires Libconfig")
 endif()
