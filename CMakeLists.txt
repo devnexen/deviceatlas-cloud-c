@@ -5,7 +5,7 @@ find_path(HAVE_CONFIG libconfig.h)
 find_path(HAVE_CURL curl/curl.h)
 find_path(HAVE_JANSSON jansson.h)
 
-# cache providers
+# memcached cache provider
 find_path(HAVE_MEMCACHED libmemcached/memcached.h)
 
 set(CACHELIBS "")
