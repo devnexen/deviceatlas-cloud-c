@@ -104,7 +104,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
          }
 
          while ((cache = fopen(fcfg->dir, "r")) == NULL) {
-             sleep(1);
+             usleep(1000000);
              ++ i;
              if (i == 3)
                  break;
@@ -182,7 +182,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
          }
 
          while ((cache = fopen(fcfg->dir, "w")) == NULL) {
-             sleep(1);
+             usleep(1000000);
              ++ i;
              if (i == 3)
                  break;
