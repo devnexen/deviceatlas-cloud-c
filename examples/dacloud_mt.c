@@ -14,12 +14,15 @@ void *
 da_cloud_process_req(void *arg) {
     struct da_cloud_header_head hhead;
     struct da_cloud_property_head phead;
+	struct da_cloud_property *p;
     struct da_cloud_req *req = arg;
     memset(&hhead, 0, sizeof(hhead));
     da_cloud_header_init(&hhead);
     da_cloud_header_add(&hhead, "user-agent", "Dalvik/1.2.0 (Linux; U; Android 2.2.1; GT-S5830L Build/FROYO)");
     printf("thread %d starts\n", req->tid);
     da_cloud_detect(&req->cfg, &hhead, &phead);
+	if (da_cloud_property(&phead, "id", &p) == 0)
+		printf("thread %d : id is %ld\n", req->tid, p->value.l);
     printf("thread %d ends from %s\n", req->tid, phead.cachesource);
     da_cloud_properties_free(&phead);
     da_cloud_header_free(&hhead);

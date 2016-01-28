@@ -112,6 +112,8 @@ void da_cloud_print_property(FILE *, struct da_cloud_property *);
  */
 int da_cloud_init(struct da_cloud_config *, const char *);
 int da_cloud_detect(struct da_cloud_config *, struct da_cloud_header_head *, struct da_cloud_property_head *);
+int da_cloud_property(struct da_cloud_property_head *, const char *, struct da_cloud_property **);
+int da_cloud_property_count(struct da_cloud_property_head *, size_t *);
 void da_cloud_properties_free(struct da_cloud_property_head *);
 void da_cloud_fini(struct da_cloud_config *);
 
