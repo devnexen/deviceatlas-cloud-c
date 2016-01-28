@@ -110,6 +110,36 @@ da_cloud_header_free(struct da_cloud_header_head *head) {
     }
 }
 
+int
+da_cloud_property(struct da_cloud_property_head *phead, const char *pname, struct da_cloud_property **prop) {
+	if (prop == NULL)
+		return (-1);
+	SLIST_FOREACH(*prop, &phead->list, entries) {
+		if (strcasecmp((*prop)->name, pname) == 0)
+			return (0);
+	}
+
+	*prop = NULL;
+
+	return (-1);
+}
+
+int
+da_cloud_property_count(struct da_cloud_property_head *phead, size_t *count) {
+	struct da_cloud_property *p;
+	size_t ct;
+	if (count == NULL)
+		return (-1);
+	*count = ct = 0;
+	SLIST_FOREACH(p, &phead->list, entries) {
+		ct ++;
+	}
+
+	*count = ct;
+
+	return (0);
+}
+
 void
 da_cloud_properties_free(struct da_cloud_property_head *phead) {
     struct da_cloud_property *p = SLIST_FIRST(&phead->list);
