@@ -19,7 +19,7 @@ main(int argc, char *argv[]) {
         da_cloud_header_init(&head);
         da_cloud_header_add(&head, "user-agent", useragent.c_str());
         if (da_cloud_detect(&config, &head, &phead) == 0) {
-            da_cloud_property *p;
+            struct da_cloud_property *p;
             SLIST_FOREACH(p, &phead.list, entries) {
                 da_cloud_property_type type = p->type;
                 cout << p->name << ": ";
