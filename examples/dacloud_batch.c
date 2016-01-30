@@ -18,10 +18,10 @@ print_headers(struct da_cloud_header_head hhead) {
 static void
 print_properties(struct da_cloud_property_head phead) {
     struct da_cloud_property *p;
-    size_t i = 0;
+    size_t i;
+	da_cloud_property_count(&phead, &i);
     SLIST_FOREACH(p, &phead.list, entries) {
         da_cloud_print_property(stderr, p);
-        i ++;
     }
     printf("source : %s\n", strlen(phead.cachesource) > 0 ? phead.cachesource : "none");
     printf("properties : %d\n", (int)i);
