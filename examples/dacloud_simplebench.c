@@ -7,13 +7,14 @@
 int
 main(int argc, char *argv[]) {
     struct da_cloud_config config;
-    const char *configpath;
+    const char *configpath, *iterationstr;
     int iterations = DEFAULT_ITERATIONS;
     if (argc < 2)
         return (-1);
     if (argc >= 3) {
-        int tmp = strtol(argv[2], 0, 10);
-        if (tmp > 0)
+		iterationstr = argv[2];
+        int tmp = strtol(iterationstr, 0, 10);
+        if (tmp > 0 && tmp < SHRT_MAX)
             iterations = tmp;
     }
     configpath = argv[1];
