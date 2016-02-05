@@ -12,7 +12,7 @@ main(int argc, char *argv[]) {
     if (argc < 2)
         return (-1);
     if (argc >= 3) {
-		iterationstr = argv[2];
+        iterationstr = argv[2];
         int tmp = strtol(iterationstr, 0, 10);
         if (tmp > 0 && tmp < SHRT_MAX)
             iterations = tmp;
