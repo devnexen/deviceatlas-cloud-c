@@ -18,6 +18,10 @@ main(int argc, char *argv[]) {
         da_cloud_property_head phead;
         da_cloud_header_init(&head);
         da_cloud_header_add(&head, "user-agent", useragent.c_str());
+		if (argc > 3) {
+			string clientside = argv[3];
+			da_cloud_clientside_add(&head, clientside.c_str());
+		}
         if (da_cloud_detect(&config, &head, &phead) == 0) {
             struct da_cloud_property *p;
             SLIST_FOREACH(p, &phead.list, entries) {
