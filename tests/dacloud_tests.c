@@ -69,6 +69,10 @@ main(int argc, char *argv[]) {
 	}
 
 	cu = CU_initialize_registry();
+    if (cu != CUE_SUCCESS) {
+        fprintf(stderr, "error cunit initialization: %s\n", CU_get_error_msg());
+        exit(-1);
+    }
 	configpath = argv[1];
     if (argc > 2)
             mode = argv[2];
