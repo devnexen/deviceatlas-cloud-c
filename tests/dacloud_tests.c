@@ -9,44 +9,44 @@ static struct da_cloud_config config;
 
 void
 da_cloud_properties_test(void) {
-	struct da_cloud_header_head headers;
-	struct da_cloud_property_head properties; 
-	struct da_cloud_property *p;
-	const char *property;
-	size_t count;
+    struct da_cloud_header_head headers;
+    struct da_cloud_property_head properties; 
+    struct da_cloud_property *p;
+    const char *property;
+    size_t count;
 
-	property = "isRobot";
+    property = "isRobot";
 
-	da_cloud_header_init(&headers);
-	da_cloud_header_add(&headers, "user-agent", "Googlebot-Image/1.0");
-	CU_ASSERT_FATAL(da_cloud_detect(&config, &headers, &properties) == 0);
-	CU_ASSERT(da_cloud_property_count(&properties, &count) == 0);
-	CU_ASSERT(count == 9);
-	CU_ASSERT_FATAL(da_cloud_property(&properties, property, &p) == 0);
-	CU_ASSERT_STRING_EQUAL(p->name, property);
-	CU_ASSERT(p->value.l == 1);
-	da_cloud_properties_free(&properties);
-	da_cloud_header_free(&headers);
+    da_cloud_header_init(&headers);
+    da_cloud_header_add(&headers, "user-agent", "Googlebot-Image/1.0");
+    CU_ASSERT_FATAL(da_cloud_detect(&config, &headers, &properties) == 0);
+    CU_ASSERT(da_cloud_property_count(&properties, &count) == 0);
+    CU_ASSERT(count == 9);
+    CU_ASSERT_FATAL(da_cloud_property(&properties, property, &p) == 0);
+    CU_ASSERT_STRING_EQUAL(p->name, property);
+    CU_ASSERT(p->value.l == 1);
+    da_cloud_properties_free(&properties);
+    da_cloud_header_free(&headers);
 }
 
 void
 da_cloud_simple_lookup(void) {
-	struct da_cloud_header_head headers;
-	struct da_cloud_property_head properties; 
+    struct da_cloud_header_head headers;
+    struct da_cloud_property_head properties; 
     struct da_cloud_property *p;
     const char *property;
 
     property = "model";
 
-	da_cloud_header_init(&headers);
-	da_cloud_header_add(&headers, "user-agent", "iPhone");
+    da_cloud_header_init(&headers);
+    da_cloud_header_add(&headers, "user-agent", "iPhone");
     da_cloud_clientside_add(&headers, "sdevicePixelRatio:2|sdeviceAspectRatio:40/71");
-	CU_ASSERT_FATAL(da_cloud_detect(&config, &headers, &properties) == 0);
+    CU_ASSERT_FATAL(da_cloud_detect(&config, &headers, &properties) == 0);
     CU_ASSERT_FATAL(da_cloud_property(&properties, property, &p) == 0);
     CU_ASSERT_STRING_EQUAL(p->name, property);
     CU_ASSERT_STRING_EQUAL(p->value.s, "iPhone 5");
-	da_cloud_properties_free(&properties);
-	da_cloud_header_free(&headers);
+    da_cloud_properties_free(&properties);
+    da_cloud_header_free(&headers);
 }
 
 void
