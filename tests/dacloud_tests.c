@@ -1,5 +1,5 @@
 #include <CUnit/CUnit.h>
-#include <CUnit/Basic.h>
+#include <CUnit/Automated.h>
 
 #include <dacloud.h>
 #include <stdlib.h>

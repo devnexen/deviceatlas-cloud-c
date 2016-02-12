@@ -55,6 +55,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 subdirs(examples)
 
 if (NOT ${HAVE_CUNIT} STREQUAL "HAVE_CUNIT-NOTFOUND")
+    find_library(CUNIT cunit)
     message(STATUS "CUnit support")
     subdirs(tests)
 endif()
