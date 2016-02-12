@@ -98,6 +98,13 @@ da_cloud_header_add(struct da_cloud_header_head *head,
     return (0);
 }
 
+int
+da_cloud_clientside_add(struct da_cloud_header_head *head,
+    const char *value) {
+#define CLOUD_CLIENTSIDE_NAME   "Client-Properties"
+    return da_cloud_header_add(head, CLOUD_CLIENTSIDE_NAME, value);
+}
+
 void
 da_cloud_header_free(struct da_cloud_header_head *head) {
     struct da_cloud_header *dh = SLIST_FIRST(&head->list);

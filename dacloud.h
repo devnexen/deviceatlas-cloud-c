@@ -46,6 +46,7 @@ struct da_cloud_header_head {
 
 int da_cloud_header_init(struct da_cloud_header_head *);
 int da_cloud_header_add(struct da_cloud_header_head *, const char *, const char *);
+int da_cloud_clientside_add(struct da_cloud_header_head *, const char *);
 void da_cloud_header_free(struct da_cloud_header_head *);
 
 enum da_cloud_property_type {
