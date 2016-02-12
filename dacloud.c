@@ -101,7 +101,7 @@ da_cloud_header_add(struct da_cloud_header_head *head,
 int
 da_cloud_clientside_add(struct da_cloud_header_head *head,
     const char *value) {
-#define CLOUD_CLIENTSIDE_NAME   "DAPROPS"
+#define CLOUD_CLIENTSIDE_NAME   "Client-Properties"
     return da_cloud_header_add(head, CLOUD_CLIENTSIDE_NAME, value);
 }
 
