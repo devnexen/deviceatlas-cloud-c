@@ -385,7 +385,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     response = NULL;
     cacheval = NULL;
     _ret = -1;
-    strcpy(phead->cachesource, "none");
+    strncpy(phead->cachesource, "none", sizeof("none") - 1);
+    phead->cachesource[sizeof("none") - 1] = '\0';
     SLIST_INIT(&phead->list);
 
     SLIST_FOREACH(h, &head->list, entries) {
@@ -404,7 +405,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     da_cloud_crypt_key(cachekeybuf, sizeof(cachekeybuf), cachekey, sizeof(cachekey));
     config->cops.get(&config->cache_cfg, cachekey, &cacheval);
     if (cacheval != NULL) {
-        strcpy(phead->cachesource, "cache");
+        strncpy(phead->cachesource, "cache", sizeof("cache") - 1);
+        phead->cachesource[sizeof("cache") - 1] = '\0';
         _ret = 0;
         goto jsoninit;
     }
@@ -448,7 +450,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
                 da_cloud_log(config->efp, "could not cache %s", cachekey, NULL);
 
             cacheval = strdup(dr->buf);
-            strcpy(phead->cachesource, "cloud");
+            strncpy(phead->cachesource, "cloud", sizeof("cloud") - 1);
+            phead->cachesource[sizeof("cloud") - 1] = '\0';
             data_reader_free(dr);
             curl_slist_free_all(hd);
             curl_easy_cleanup(c);
