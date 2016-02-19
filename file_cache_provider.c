@@ -25,14 +25,14 @@ file_cache_mkdir(char *dir, size_t dirlen, const char *key, int creat, mode_t m)
     struct stat s;
     memset(&s, 0, sizeof(s));
     dir[dirlen] = 0;
-    strcat(dir, "/");
+    strncat(dir, "/", 1);
     strncat(dir, key, 1);
     if (creat) {
         if (mkdir(dir, 0777 & ~m) != 0)
             return (-1);
     }
-    strcat(dir, "/");
-    strcat(dir, key + 1);    
+    strncat(dir, "/", 1);
+    strncat(dir, key + 1, 1);    
 
     return (0);
 }
@@ -72,8 +72,9 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         return (-1);
     }
 
-    strcpy(fcfg->dir, cfg->cache_cfg_str);
-    fcfg->dirlen = strlen(fcfg->dir);
+    fcfg->dirlen = strlen(cfg->cache_cfg_str);
+    strncpy(fcfg->dir, cfg->cache_cfg_str, fcfg->dirlen);
+    fcfg->dir[fcfg->dirlen] = '\0';
     cfg->cache_obj = fcfg;
 
     return (0);
