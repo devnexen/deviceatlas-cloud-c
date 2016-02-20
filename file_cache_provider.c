@@ -9,6 +9,18 @@
 
 #include "file_cache_provider.h"
 
+#define FILE_CACHE_READ_ATTEMPT                         \
+    while ((cache = fopen(fcfg->dir, "r")) == NULL) {   \
+        usleep(1000000);                                \
+        ++ i;                                           \
+        if (i == 3)                                     \
+        break;                                          \
+    }                                                   \
+
+#define FILE_MTX_DISPOSE                                \
+    pthread_mutex_unlock(&mtx);                         \
+    pthread_mutex_destroy(&mtx)
+
 struct file_cache_cfg {
     size_t dirlen;
     char dir[PATH_MAX];
@@ -83,78 +95,67 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
 int
 file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
     if (cfg->cache_obj != NULL && value != NULL) {
-         FILE *cache = NULL;
-         pthread_mutex_t mtx;
-         mode_t m;
-         struct stat s;
-         size_t valuelen, i = 0;
-         int cachefd = -1;
-         struct file_cache_cfg *fcfg = cfg->cache_obj;
-         if (pthread_mutex_init(&mtx, NULL) != 0) {
-             da_cloud_log(cfg->efp, "could not lock", NULL);
-             return (-1);
-         }
-         
-         pthread_mutex_lock(&mtx);
+        FILE *cache = NULL;
+        pthread_mutex_t mtx;
+        mode_t m;
+        struct stat s;
+        size_t valuelen, i = 0;
+        int cachefd = -1;
+        struct file_cache_cfg *fcfg = cfg->cache_obj;
+        if (pthread_mutex_init(&mtx, NULL) != 0) {
+            da_cloud_log(cfg->efp, "could not lock", NULL);
+            return (-1);
+        }
 
-         file_cache_setumask(&m);
-         if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 0, m) == -1) {
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             return (-1);
-         }
+        pthread_mutex_lock(&mtx);
 
-         while ((cache = fopen(fcfg->dir, "r")) == NULL) {
-             usleep(1000000);
-             ++ i;
-             if (i == 3)
-                 break;
-         }
+        file_cache_setumask(&m);
+        if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 0, m) == -1) {
+            FILE_MTX_DISPOSE;
+            return (-1);
+        }
 
-         if (cache == NULL) {
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             return (-1);
-         }
+        FILE_CACHE_READ_ATTEMPT
 
-         cachefd = fileno(cache);
-         memset(&s, 0, sizeof(s));
-         if (fstat(cachefd, &s) != 0) {
-             fclose(cache);
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             return (-1);
-         }
+        if (cache == NULL) {
+            FILE_MTX_DISPOSE;
+            return (-1);
+        }
 
-         if ((time_t)(s.st_mtime + cfg->expiration) <= time(NULL)) {
-             fclose(cache);
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             if (unlink(fcfg->dir) == - 1)
-                 da_cloud_log(cfg->efp, "could not delete '%s' file", fcfg->dir, NULL);
-             return (-1);
-         }
+        cachefd = fileno(cache);
+        memset(&s, 0, sizeof(s));
+        if (fstat(cachefd, &s) != 0) {
+            fclose(cache);
+            FILE_MTX_DISPOSE;
+            return (-1);
+        }
 
-         if (flock(cachefd, LOCK_SH)  == -1) {
-             fclose(cache);
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             da_cloud_log(cfg->efp, "could not lock the cache", NULL);
-             return (-1);
-         }
+        if ((time_t)(s.st_mtime + cfg->expiration) <= time(NULL)) {
+            fclose(cache);
+            FILE_MTX_DISPOSE;
+            if (unlink(fcfg->dir) == - 1)
+                da_cloud_log(cfg->efp, "could not delete '%s' file", fcfg->dir, NULL);
+            return (-1);
+        }
 
-         fseek(cache, 0, SEEK_END);
-         valuelen = ftell(cache);
-         rewind(cache);
+        if (flock(cachefd, LOCK_SH)  == -1) {
+            fclose(cache);
+            FILE_MTX_DISPOSE;
+            da_cloud_log(cfg->efp, "could not lock the cache", NULL);
+            return (-1);
+        }
 
-         *value = malloc(sizeof(char) * valuelen + 1);
-         fgets(*value, valuelen + 1, cache);
-         flock(cachefd, LOCK_UN);
-         fclose(cache);
-         pthread_mutex_unlock(&mtx);
-         pthread_mutex_destroy(&mtx);
+        fseek(cache, 0, SEEK_END);
+        valuelen = ftell(cache);
+        rewind(cache);
 
-         return (0);
+        *value = malloc(sizeof(char) * valuelen + 1);
+        fgets(*value, valuelen + 1, cache);
+        flock(cachefd, LOCK_UN);
+        fclose(cache);
+        FILE_MTX_DISPOSE;
+
+        return (0);
     }
 
     return (-1);
@@ -163,54 +164,45 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
 int
 file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) {
     if (cfg->cache_obj != NULL) {
-         FILE *cache = NULL;
-         pthread_mutex_t mtx;
-         size_t i = 0;
-         mode_t m;
-         int cachefd = -1;
-         struct file_cache_cfg *fcfg = cfg->cache_obj;
-         if (pthread_mutex_init(&mtx, NULL) != 0) {
-             da_cloud_log(cfg->efp, "could not lock", NULL);
-             return (-1);
-         }
-         
-         pthread_mutex_lock(&mtx);
-         file_cache_setumask(&m);
-         if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 1, m) == -1) {
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             return (0);
-         }
+        FILE *cache = NULL;
+        pthread_mutex_t mtx;
+        size_t i = 0;
+        mode_t m;
+        int cachefd = -1;
+        struct file_cache_cfg *fcfg = cfg->cache_obj;
+        if (pthread_mutex_init(&mtx, NULL) != 0) {
+            da_cloud_log(cfg->efp, "could not lock", NULL);
+            return (-1);
+        }
 
-         while ((cache = fopen(fcfg->dir, "w")) == NULL) {
-             usleep(1000000);
-             ++ i;
-             if (i == 3)
-                 break;
-         }
+        pthread_mutex_lock(&mtx);
+        file_cache_setumask(&m);
+        if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 1, m) == -1) {
+            FILE_MTX_DISPOSE;
+            return (0);
+        }
 
-         if (cache == NULL) {
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             return (-1);
-         }
+        FILE_CACHE_READ_ATTEMPT
 
-         cachefd = fileno(cache);
-         if (flock(cachefd, LOCK_EX) == -1) {
-             pthread_mutex_unlock(&mtx);
-             pthread_mutex_destroy(&mtx);
-             da_cloud_log(cfg->efp, "could not lock the cache", NULL);
-             fclose(cache);
-             return (-1);
-         }
+        if (cache == NULL) {
+            FILE_MTX_DISPOSE;
+            return (-1);
+        }
 
-         fwrite(value, 1, strlen(value), cache);
-         flock(cachefd, LOCK_UN);
-         fclose(cache);
-         pthread_mutex_unlock(&mtx);
-         pthread_mutex_destroy(&mtx);
+        cachefd = fileno(cache);
+        if (flock(cachefd, LOCK_EX) == -1) {
+            FILE_MTX_DISPOSE;
+            da_cloud_log(cfg->efp, "could not lock the cache", NULL);
+            fclose(cache);
+            return (-1);
+        }
 
-         return (0);
+        fwrite(value, 1, strlen(value), cache);
+        flock(cachefd, LOCK_UN);
+        fclose(cache);
+        FILE_MTX_DISPOSE;
+
+        return (0);
     }
 
     return (-1);
