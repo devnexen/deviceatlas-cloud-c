@@ -1,31 +1,33 @@
+dist: trusty
+
 env:
     global:
         - secure: "utqWsCDwRjodZr8hqSKmLBHjxAj5k4Gckox13YKQfsVkNLCTMCaPo8QKxzORwv24If7Tc4YhehNZx45g2tP7G2tptNx8X+O8l3vLFWWLVYyVbUTFoJe+QvuEqR0NlMoiiOl1tj3YTQFclD7olgNryHDJtWIzIWN+2UwN43s80bwQT7lXqgBwWgUBLLkypcOnd9jMIPBsvw0F9n0hKnyX5cEcnL/qUNw0+EDfZsnaNDY2miLroRCG3u7xrGTl4jxqokI3BFRzLqV1+fs6gwxxxDCIvLndkHOA/yywISNAQtNLzz9MTDoVsdKG0aWSZIZ9Qs+AcLbsC0d3clNnpGeNgJ6jWMW0G//5eJDhIxKfgvSJfEsXlrWWfCmEo/SpGQhysdrc2oN6vNTxIwvrgVa1cBvbpkF0HMk3ZfdXhaThclZ5cvdqpgWgngEyQAOeYVZRH3sWxBXwUSu+F+icyPH0J5ksvgtLvzLp364FKOjzyxzoGNoa7jQuv6RGwGjJOOzLRDQJZZ1KoeAT5qgERjUlOmODFLEcAfdu+7S4kgmPVxjLwCOiF1I9wjnWFLqnXnMpqCYCZ54YA1kBIooyAVpLAya4LWqSuQm42yNkh8kMSP2NGENBRsRvr9OufegJL7qMjRYtQVVxPfHiM+HdXPTnxdXzRndkf3zPdJjcMteG5wQ="
 
 addons:
+    apt:
+        packages:
+            - libconfig-dev
+            - libjansson-dev
+            - libmemcached-dev
+            - libcunit1-dev
     coverity-scan:
         project:
             name: devnexen/deviceatlas-cloud-c
             version: 1.0
-            description: See README.md
+            description: See README.md for more details
         notification_email: devnexen@gmail.com
         build_command_prepend: cmake .
         build_command: make
         branch_pattern: coverity_scan
         
 
-# Should work with both
+# coverity uses gcc
 compiler:
 - gcc
-- clang
 
-before_install:
-- sudo apt-get -qq update
-- sudo apt-get install libconfig-dev
-- sudo apt-get install libjansson-dev
-- sudo apt-get install libmemcached-dev
-- sudo apt-get install libcunit1-dev
+before_script: 
+    - cmake -DCMAKE_C_FLAGS="-Wall"
 
-before_script: cmake -DCMAKE_C_FLAGS="-Wall"
-
-script: make
+script: 
+    - make
