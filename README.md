@@ -10,7 +10,7 @@ A local cache handler can be used to avoid using Cloud service hits with a same 
 
 - At the moment a simple disk and memcached cache solutions are supported.
 - 2 samples configuration files for each cache support are provided.
-- 3 examples which represents sort of use cases, batch, multi thread and a simple one for pure speed benchmarking.
+- 3 examples which represents sort of use cases, batch, C++ example, multi thread and a simple one for pure speed benchmarking.
 - A new cache handler can be written via the cache's provider interface as long as the library used is multi thread safe.
 - A basic travis build configuration.
 
@@ -40,4 +40,4 @@ b/ Optional
 - batch       : examples/dacloud_batch <configuration file path> < <file of user agents> (N.B: a sample batch file can be found inside examples folder)
 - C++         : examples/dacloud_cppclient <configuration file path> <user-agent>
 - MultiThread : examples/dacloud_mt <configuration file path>
-- Benchmark   : examples/dacloud_simplebench <configuration file path> [<number of iterations, per default 1000>]
+- Benchmark   : examples/dacloud_simplebench <configuration file path> [ number of iterations, per default 1000 ]
