@@ -3,12 +3,12 @@ secure: "utqWsCDwRjodZr8hqSKmLBHjxAj5k4Gckox13YKQfsVkNLCTMCaPo8QKxzORwv24If7Tc4Y
 addons:
     coverity-scan:
         project:
-            name:
-                devnexen/deviceatlas-cloud-c
-        notification_email:
-                devnexen@gmail.com
-        build_command_prepend: "cmake -DCMAKE_C_FLAGS=\"-Wall\""
-        build_command: "make"
+            name: devnexen/deviceatlas-cloud-c
+            version: 1.0
+            description: See README.md
+        notification_email: devnexen@gmail.com
+        build_command_prepend: cmake .
+        build_command: make
         branch_pattern: coverity_scan
         
 
