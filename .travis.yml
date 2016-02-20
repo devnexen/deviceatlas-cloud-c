@@ -1,4 +1,17 @@
 # Should work with both
+secure: "PznWHaFeeJneDU6IMjJNfJcWQrxLoEpbM3RuunoJs/qbk9Z5ghrbNxoHS4lPMPD9zZxjpXmWnrfs5lejOOkYQvlfmfK32z+5zR+9KYZCIalwUQ3GBJePr00P8gHYi8mQwoaiDuOLhaaS7BTbp/qdPMzoKXZOIH2XijtUDcVb03GYH4BStU1dWkEb2AWYBjqF83Cv3UkQ0HDqsPVS4BvaKfJhGOBzGI7b1GWoCT2jAC2jtCKYDAuelI+/fsE/vP1NXVt/JYP/oxWYcXWTLkK9pPWJfZ8v3XUm5nBRLd2mW09IKAIjANaEIbnS7ameCs7cLa7wWcGem1wdwMRFbrlD6UFqvH2vMYEUEHoXrUxLRcxhJHW8TdIJiFJiZ7ijV4m+yNND8ID8ofc7VdVHdiOffVhFfT4lr1uqBU1TUUIM3wHfcJ4RzmB09D0OUurVuwvdhyFZrvnf6gEfGGcqRuE15ZkK4D7+/kojWCEcrHoidSOCGvlPZsj6eOChCBS6wS8yrm1I/PGIi7ErTcxTwz/oUEFw4EnSFv264ROEdz2esq+pQtwKSyLUoXMgSBS2rvXZXhV7C32ic9rSBHWfU27GGSyUHJa9QgVXwrmdf5QvIktmezVd27Yy3ypJD0xZ5BFbJBhe2jVyC67e3qjb56qt5KolW6sFQ2lLXgnQhMmFLoY="
+
+addons:
+    coverity-scan:
+        project:
+            name:
+                devnexen/deviceatlas-cloud-c
+        notification_email:
+                devnexen@gmail.com
+        build_command_prepend: "cmake -DCMAKE_C_FLAGS=\"-Wall\""
+        build_command: "make"
+        
+
 compiler:
 - gcc
 - clang
@@ -10,4 +23,6 @@ before_install:
 - sudo apt-get install libmemcached-dev
 - sudo apt-get install libcunit1-dev
 
-script: cmake -DCMAKE_C_FLAGS="-Wall" && make && cd tests && ctest
+before_script: cmake -DCMAKE_C_FLAGS="-Wall"
+
+script: make
