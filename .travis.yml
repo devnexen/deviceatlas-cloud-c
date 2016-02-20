@@ -5,12 +5,21 @@ env:
 addons:
     coverity-scan:
         project:
+<<<<<<< HEAD
             name: devnexen/deviceatlas-cloud-c
             version: 1.0
             description: See README.md
         notification_email: devnexen@gmail.com
         build_command_prepend: cmake .
         build_command: make
+=======
+            name:
+                devnexen/deviceatlas-cloud-c
+        notification_email:
+                devnexen@gmail.com
+        build_command_prepend: "cmake -DCMAKE_C_FLAGS=\"-Wall\""
+        build_command: "make"
+>>>>>>> splitting the code a bit around
         branch_pattern: coverity_scan
         
 
