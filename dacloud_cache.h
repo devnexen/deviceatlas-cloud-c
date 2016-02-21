@@ -22,6 +22,8 @@
 #include <time.h>
 #include <stdio.h>
 
+struct da_cloud_config;
+
 struct da_cloud_cache_cfg {
     void *data;
     void *cache_obj;
@@ -31,6 +33,7 @@ struct da_cloud_cache_cfg {
 };
 
 struct da_cloud_cache_ops {
+    const char * (*id)(void);
     int (*init)(struct da_cloud_cache_cfg *);
     int (*get)(struct da_cloud_cache_cfg *, const char *, char **);
     int (*set)(struct da_cloud_cache_cfg *, const char *, const char *);
@@ -40,6 +43,7 @@ struct da_cloud_cache_ops {
 void
 da_cloud_crypt_key(char *, size_t, char *, size_t);
 
+const char *mock_cache_id(void);
 int mock_cache_init(struct da_cloud_cache_cfg *);
 int mock_cache_get(struct da_cloud_cache_cfg *, const char *, char **);
 int mock_cache_set(struct da_cloud_cache_cfg *, const char *, const char *);

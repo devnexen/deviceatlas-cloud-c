@@ -25,6 +25,9 @@ da_cloud_crypt_key(char *source, size_t sourcelen, char *result, size_t resultle
     *result = 0;
 }
 
+const char *
+mock_cache_id(void) { return "mock"; }
+
 int
 mock_cache_init(struct da_cloud_cache_cfg *cfg) { (void)cfg; return (0); }
 

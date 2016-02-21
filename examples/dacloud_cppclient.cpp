@@ -42,6 +42,7 @@ main(int argc, char *argv[]) {
                 cout << endl;
             }
             cout << "source: " << phead.cachesource << endl;
+            cout << "cache set: " << da_cloud_cache_id(&config) << endl;
             da_cloud_properties_free(&phead);
         }
         da_cloud_header_free(&head);
