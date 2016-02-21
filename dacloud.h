@@ -117,6 +117,8 @@ int da_cloud_property(struct da_cloud_property_head *, const char *, struct da_c
 int da_cloud_property_count(struct da_cloud_property_head *, size_t *);
 void da_cloud_properties_free(struct da_cloud_property_head *);
 void da_cloud_fini(struct da_cloud_config *);
+/* Handy function to get the cache identifier */
+const char *da_cloud_cache_id(struct da_cloud_config *);
 
 #ifdef __cplusplus
 }

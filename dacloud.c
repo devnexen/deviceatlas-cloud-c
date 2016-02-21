@@ -417,3 +417,8 @@ da_cloud_fini(struct da_cloud_config *config) {
     free(config->licence_key);
     curl_global_cleanup();
 }
+
+const char *
+da_cloud_cache_id(struct da_cloud_config *config) {
+    return config->cops.id();
+}
