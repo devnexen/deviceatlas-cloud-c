@@ -49,6 +49,11 @@ file_cache_mkdir(char *dir, size_t dirlen, const char *key, int creat, mode_t m)
     return (0);
 }
 
+const char *
+file_cache_id(void) {
+    return "file";
+}
+
 int
 file_cache_init(struct da_cloud_cache_cfg *cfg) {
     struct file_cache_cfg *fcfg;

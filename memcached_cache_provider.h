@@ -21,6 +21,7 @@
 #define  MEMCACHED_PROVIDER_H
 #include "dacloud_cache.h"
 
+const char *memcached_cache_id(void);
 int memcached_cache_init(struct da_cloud_cache_cfg *);
 int memcached_cache_get(struct da_cloud_cache_cfg *, const char *, char **);
 int memcached_cache_set(struct da_cloud_cache_cfg *, const char *, const char *);

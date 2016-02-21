@@ -26,6 +26,7 @@
 #endif
 
 #define  CACHE_SET(cops, name)         	\
+    cops->id = name ## _cache_id;   \
     cops->init = name ## _cache_init; 	\
     cops->get = name ## _cache_get;     \
     cops->set = name ## _cache_set;     \
