@@ -34,12 +34,10 @@ file_cache_setumask(mode_t *m) {
 
 static int
 file_cache_mkdir(char *dir, size_t dirlen, const char *key, int creat, mode_t m) {
-    struct stat s;
-    memset(&s, 0, sizeof(s));
     dir[dirlen] = 0;
     strcat(dir, "/");
     strncat(dir, key, 1);
-    if (creat && stat(dir, &s) != 0) {
+    if (creat) {
         if (mkdir(dir, 0777 & ~m) != 0)
             return (-1);
     }
