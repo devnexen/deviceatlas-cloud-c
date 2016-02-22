@@ -9,8 +9,8 @@
 
 #include "file_cache_provider.h"
 
-#define FILE_CACHE_READ_ATTEMPT                         \
-    while ((cache = fopen(fcfg->dir, "r")) == NULL) {   \
+#define FILE_CACHE_ATTEMPT(mode)                        \
+    while ((cache = fopen(fcfg->dir, mode)) == NULL) {  \
         usleep(1000000);                                \
         ++ i;                                           \
         if (i == 3)                                     \
@@ -37,14 +37,14 @@ file_cache_mkdir(char *dir, size_t dirlen, const char *key, int creat, mode_t m)
     struct stat s;
     memset(&s, 0, sizeof(s));
     dir[dirlen] = 0;
-    strncat(dir, "/", 1);
+    strcat(dir, "/");
     strncat(dir, key, 1);
-    if (creat) {
+    if (creat && stat(dir, &s) != 0) {
         if (mkdir(dir, 0777 & ~m) != 0)
             return (-1);
     }
-    strncat(dir, "/", 1);
-    strncat(dir, key + 1, 1);    
+    strcat(dir, "/");
+    strcat(dir, key + 1);    
 
     return (0);
 }
@@ -120,7 +120,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
             return (-1);
         }
 
-        FILE_CACHE_READ_ATTEMPT
+        FILE_CACHE_ATTEMPT("r")
 
         if (cache == NULL) {
             FILE_MTX_DISPOSE;
@@ -187,7 +187,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
             return (0);
         }
 
-        FILE_CACHE_READ_ATTEMPT
+        FILE_CACHE_ATTEMPT("w")
 
         if (cache == NULL) {
             FILE_MTX_DISPOSE;
