@@ -92,6 +92,7 @@ struct da_cloud_server {
 struct da_cloud_server_head {
     struct da_cloud_server **servers;
     size_t nb;
+    unsigned int dservers: 1;
 };
 
 struct da_cloud_config {
