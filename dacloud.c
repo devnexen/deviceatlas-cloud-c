@@ -18,6 +18,13 @@
 
 static int _da_cloud_servers_fireup(struct da_cloud_server_head *);
 
+static struct da_cloud_server default_servers[4] = {
+    { .host = "http://region0.deviceatlascloud.com", .port = 80, .response_time = -1.0 },
+    { .host = "http://region1.deviceatlascloud.com", .port = 80, .response_time = -1.0 },
+    { .host = "http://region2.deviceatlascloud.com", .port = 80, .response_time = -1.0 },
+    { .host = "http://region3.deviceatlascloud.com", .port = 80, .response_time = -1.0 },
+};
+
 void
 da_cloud_print_server(FILE *fp, struct da_cloud_server *s) {
     if (fp != NULL)
@@ -215,12 +222,6 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         config_lookup_string(&cfg, "user.cache.config", &cache_string);
     }
 
-    if ((servers = config_lookup(&cfg, "servers")) == NULL) {
-        da_cloud_log(config->efp, "%s: could not find servers config", confpath, NULL);
-        config_destroy(&cfg);
-        return (-1);
-    }
-
     config->licence_key = strdup(licence_key);
 
     if (cache_name != NULL && cache_string != NULL) {
@@ -235,6 +236,9 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
 
         free(config->cache_cfg.cache_cfg_str);
     }
+
+    if ((servers = config_lookup(&cfg, "servers")) == NULL)
+        goto noservers;
 
     while ((server = config_setting_get_elem(servers, nservers)) != NULL) {
         struct da_cloud_server *s;
@@ -258,9 +262,19 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         config->shead->nb = nservers;
     }
 
+noservers:
     config_destroy(&cfg);
-    if (nservers == 0)
-        return (-1);
+    if (nservers == 0) {
+        size_t i = 0;
+        nservers = sizeof(default_servers) / sizeof(default_servers[0]);
+        config->shead->servers = malloc(nservers * sizeof(*config->shead->servers));
+        for (i = 0; i < nservers; i ++)
+            config->shead->servers[i] = &default_servers[i];
+        config->shead->nb = nservers;
+        config->shead->default_servers = 1;
+    } else {
+        config->shead->default_servers = 0;
+    }
 
     curl_global_init(CURL_GLOBAL_NOTHING);
 
@@ -523,10 +537,12 @@ void
 da_cloud_fini(struct da_cloud_config *config) {
     if (config->shead != NULL) {
         size_t i;
-        for (i = 0; i < config->shead->nb; i ++) {
-            struct da_cloud_server *s = *(config->shead->servers + i);
-            free(s->host);
-            free(s);
+        if (config->shead->default_servers == 0) {
+            for (i = 0; i < config->shead->nb; i ++) {
+                struct da_cloud_server *s = *(config->shead->servers + i);
+                free(s->host);
+                free(s);
+            }
         }
 
         free(config->shead->servers);
