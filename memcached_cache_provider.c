@@ -6,6 +6,11 @@
 
 #include "memcached_cache_provider.h"
 
+const char *
+memcached_cache_id(void) {
+    return "memcached";
+}
+
 int
 memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
     memcached_server_st *servers;
