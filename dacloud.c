@@ -149,6 +149,7 @@ noservers:
         for (i = 0; i < nservers; i ++)
             config->shead->servers[i] = &default_servers[i];
         config->shead->nb = nservers;
+        config->shead->dservers = 1;
     }
 
     curl_global_init(CURL_GLOBAL_NOTHING);
@@ -409,7 +410,7 @@ void
 da_cloud_fini(struct da_cloud_config *config) {
     if (config->shead != NULL) {
         size_t i;
-        if (config->shead->servers[0] != &default_servers[0]) {
+        if (config->shead->dservers == 0) {
             for (i = 0; i < config->shead->nb; i ++) {
                 struct da_cloud_server *s = *(config->shead->servers + i);
                 free(s->host);
