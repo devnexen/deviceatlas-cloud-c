@@ -101,6 +101,7 @@ struct da_cloud_config {
     struct da_cloud_server_head *shead;
     FILE *efp;
     char *licence_key;
+    unsigned int manual_ranking: 1;
 };
 
 /* Handy function to print a server in the related stream */
