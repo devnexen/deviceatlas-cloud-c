@@ -16,7 +16,7 @@
 #define	API_VERSION         "2.0.0"
 #define	CACHE_EXPIRATION    2952000
 
-static int _da_cloud_servers_fireup(struct da_cloud_server_head *);
+static int _da_cloud_servers_fireup(struct da_cloud_config *);
 
 static struct da_cloud_server default_servers[4] = {
     { .host = "http://region0.deviceatlascloud.com", .port = 80, .response_time = -1.0 },
@@ -53,6 +53,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     const char *licence_key, *cache_name, *cache_string, *error_path;
     config_t cfg;
     size_t nservers;
+    int manual_ranking;
     config->efp = stderr;
     config->shead = calloc(1, sizeof(*config->shead));
     if (config->shead == NULL) {
@@ -73,6 +74,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     cache_name = NULL;
     cache_string = NULL;
     error_path = NULL;
+    manual_ranking = 0;
     nservers = 0;
     config_init(&cfg);
     if (config_read_file(&cfg, confpath) != CONFIG_TRUE) {
@@ -101,6 +103,9 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     }
 
     config->licence_key = strdup(licence_key);
+
+    if (config_lookup_int(&cfg, "user.manual_ranking", &manual_ranking) == CONFIG_TRUE)
+        config->manual_ranking = manual_ranking;
 
     if (cache_name != NULL && cache_string != NULL) {
         config->cache_cfg.cache_cfg_str = strdup(cache_string);
@@ -154,7 +159,7 @@ noservers:
 
     curl_global_init(CURL_GLOBAL_NOTHING);
 
-    return (_da_cloud_servers_fireup(config->shead));
+    return (_da_cloud_servers_fireup(config));
 }
 
 static int
@@ -193,17 +198,17 @@ _write_mock(char *p, size_t size, size_t nb, void *arg) {
 }
 
 static int
-_da_cloud_servers_fireup(struct da_cloud_server_head *shead) {
+_da_cloud_servers_fireup(struct da_cloud_config *config) {
     struct da_cloud_server *s;
     size_t i = 0 ;
     int _ret = -1;
-    for (i = 0; i < shead->nb; i ++) {
+    for (i = 0; i < config->shead->nb; i ++) {
         long response_code;
         CURLcode ret;
         CURL *c = curl_easy_init();
         if (c == NULL)
             return (-1);
-        s = *(shead->servers + i);
+        s = *(config->shead->servers + i);
         s->response_time = (double)-1;
         curl_easy_setopt(c, CURLOPT_URL, s->host);
         curl_easy_setopt(c, CURLOPT_PORT, (long)s->port);
@@ -222,8 +227,9 @@ _da_cloud_servers_fireup(struct da_cloud_server_head *shead) {
         curl_easy_cleanup(c);
     }
 
-    if (_ret == 0)
-        qsort(shead->servers, shead->nb, sizeof(*shead->servers), _servers_cmp);
+    if (_ret == 0 && config->manual_ranking == 0)
+        qsort(config->shead->servers, config->shead->nb,
+                sizeof(*config->shead->servers), _servers_cmp);
     else
         fprintf(stderr, "no servers available\n");
 

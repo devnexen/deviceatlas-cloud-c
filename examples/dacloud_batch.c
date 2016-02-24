@@ -40,6 +40,8 @@ main(int argc, char *argv[]) {
         struct da_cloud_property_head phead;
         char buf[1024];
         size_t i = 0;
+        printf("default servers => %s\n", config.shead->dservers ? "yes" : "no");
+        printf("manual ranking => %s\n", config.manual_ranking ? "yes" : "no");
         for (i = 0; i < config.shead->nb; i ++)
             da_cloud_print_server(stderr, config.shead->servers[i]);
         while ((fgets(buf, sizeof(buf), stdin))) {
