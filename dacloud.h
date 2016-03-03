@@ -35,6 +35,7 @@ extern "C" {
  * internally by CURL
  */
 struct da_cloud_header {
+    char *orig_key;
     char *key;
     char *value;
     SLIST_ENTRY(da_cloud_header) entries;
