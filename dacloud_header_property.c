@@ -54,6 +54,7 @@ da_cloud_header_add(struct da_cloud_header_head *head,
     strncpy(dh->key, CLOUD_HEADER_PREFIX, sizeof(CLOUD_HEADER_PREFIX));
     strncat(dh->key, key, keylen);
     *(dh->key + keylen) = 0;
+    dh->orig_key = dh->key + (sizeof(CLOUD_HEADER_PREFIX) - 1);
     dh->value = strdup(value);
     SLIST_INSERT_HEAD(&head->list, dh, entries);
 
