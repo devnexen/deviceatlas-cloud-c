@@ -105,6 +105,8 @@ struct da_cloud_config {
     unsigned int manual_ranking: 1;
 };
 
+/* Handy function to print a header in the related stream */
+void da_cloud_print_header(FILE *, struct da_cloud_header *);
 /* Handy function to print a server in the related stream */
 void da_cloud_print_server(FILE *, struct da_cloud_server *);
 /* Handy function to print a property in the related stream */
