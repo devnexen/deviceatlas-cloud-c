@@ -4,6 +4,12 @@
 #include "dacloud.h"
 
 void
+da_cloud_print_header(FILE *fp, struct da_cloud_header *h) {
+    if (fp != NULL)
+        fprintf(fp, "%s => %s\n", h->orig_key, h->value);
+}
+
+void
 da_cloud_print_server(FILE *fp, struct da_cloud_server *s) {
     if (fp != NULL)
         fprintf(fp, "host(%s), port(%d), rank(%4.4f)\n", s->host,
