@@ -2,6 +2,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <locale>
+#include <stdexcept>
 #include "dacloud.h"
 
 using namespace std;
