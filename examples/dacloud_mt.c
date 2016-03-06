@@ -18,7 +18,7 @@ da_cloud_process_req(void *arg) {
     struct da_cloud_req *req = arg;
     memset(&hhead, 0, sizeof(hhead));
     da_cloud_header_init(&hhead);
-    da_cloud_header_add(&hhead, "user-agent", "Dalvik/1.2.0 (Linux; U; Android 2.2.1; GT-S5830L Build/FROYO)");
+    da_cloud_useragent_add(&hhead, "Dalvik/1.2.0 (Linux; U; Android 2.2.1; GT-S5830L Build/FROYO)");
     printf("thread %d starts\n", req->tid);
     da_cloud_detect(&req->cfg, &hhead, &phead);
 	if (da_cloud_property(&phead, "id", &p) == 0)
