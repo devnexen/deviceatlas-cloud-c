@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <locale>
 #include "dacloud.h"
 
 using namespace std;
@@ -17,7 +18,17 @@ main(int argc, char *argv[]) {
         da_cloud_header_head head;
         da_cloud_property_head phead;
         da_cloud_header_init(&head);
-        da_cloud_header_add(&head, "user-agent", useragent.c_str());
+        try {
+            locale lc("");
+            da_cloud_language_add(&head, lc.name().c_str());
+        } catch (runtime_error &e) {
+            cerr << e.what() << endl;
+            da_cloud_header_free(&head);
+            da_cloud_fini(&config);
+            return (-1);
+        }
+
+        da_cloud_useragent_add(&head, useragent.c_str());
         if (argc > 3) {
             string clientside = argv[3];
             da_cloud_clientside_add(&head, clientside.c_str());

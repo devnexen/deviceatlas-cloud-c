@@ -57,7 +57,7 @@ main(int argc, char *argv[]) {
                 break;
             memset(&hhead, 0, sizeof(hhead));
             da_cloud_header_init(&hhead);
-            da_cloud_header_add(&hhead, "user-agent", p);
+            da_cloud_useragent_add(&hhead, p);
             da_cloud_detect(&config, &hhead, &phead);
             print_headers(hhead);
             print_properties(phead);

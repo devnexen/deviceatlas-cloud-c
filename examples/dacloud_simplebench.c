@@ -25,7 +25,7 @@ main(int argc, char *argv[]) {
         double timetotal = 0.0;
         memset(&hhead, 0, sizeof(hhead));
         da_cloud_header_init(&hhead);
-        da_cloud_header_add(&hhead, "user-agent", "iPhone");
+        da_cloud_useragent_add(&hhead, "iPhone");
         if (gettimeofday(&start, NULL) == 0) {
             int i = 0;
             for (i = 0; i < iterations; i ++) {

@@ -74,6 +74,20 @@ da_cloud_clientside_add(struct da_cloud_header_head *head,
     return da_cloud_header_add(head, CLOUD_CLIENTSIDE_NAME, value);
 }
 
+int
+da_cloud_useragent_add(struct da_cloud_header_head *head,
+    const char *value) {
+#define USERAGENT_NAME          "User-Agent"
+    return da_cloud_header_add(head, USERAGENT_NAME, value);
+}
+
+int
+da_cloud_language_add(struct da_cloud_header_head *head,
+    const char *value) {
+#define LANGUAGE_NAME           "Accept-Language"
+    return da_cloud_header_add(head, LANGUAGE_NAME, value);
+}
+
 void
 da_cloud_header_free(struct da_cloud_header_head *head) {
     struct da_cloud_header *dh = SLIST_FIRST(&head->list);
