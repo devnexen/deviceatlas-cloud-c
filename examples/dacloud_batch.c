@@ -48,9 +48,7 @@ main(int argc, char *argv[]) {
             char *b;
             char *p = buf;
             while ((isspace(*p) || *p == '"') && p++);
-            b = strchr(p, '"');
-            if (b == NULL)
-                    b = strstr(p, "\r\n");
+            b = strpbrk(p, "\"\r\n");
             if (b != NULL)
                 *(p + (b - p)) = 0;
             if (strlen(p) == 0)

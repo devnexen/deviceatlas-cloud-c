@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 #include <pthread.h>
 
 #include "file_cache_provider.h"
@@ -38,8 +39,14 @@ file_cache_mkdir(char *dir, size_t dirlen, const char *key, int creat, mode_t m)
     strcat(dir, "/");
     strncat(dir, key, 1);
     if (creat) {
-        if (mkdir(dir, 0777 & ~m) != 0)
-            return (-1);
+        int errnos = errno;
+        if (mkdir(dir, 0777 & ~m) != 0) {
+            if (errno != EEXIST) {
+                errno = errnos;
+                return (-1);
+            }
+            errno = errnos;
+        }
     }
     strcat(dir, "/");
     strcat(dir, key + 1);    
