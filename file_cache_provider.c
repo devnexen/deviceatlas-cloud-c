@@ -11,7 +11,7 @@
 #include "file_cache_provider.h"
 
 #define FILE_CACHE_ATTEMPT(mode)                        \
-    while ((cache = fopen(fcfg->dir, mode)) == NULL) {  \
+    while ((cache = fopen(dir, mode)) == NULL) {  \
         usleep(1000000);                                \
         ++ i;                                           \
         if (i == 3)                                     \
@@ -23,7 +23,6 @@
     pthread_mutex_destroy(&mtx)
 
 struct file_cache_cfg {
-    size_t dirlen;
     char dir[PATH_MAX];
 };
 
@@ -34,8 +33,9 @@ file_cache_setumask(mode_t *m) {
 }
 
 static int
-file_cache_mkdir(char *dir, size_t dirlen, const char *key, int creat, mode_t m) {
-    dir[dirlen] = 0;
+file_cache_mkdir(struct file_cache_cfg *fcfg, char *dir,
+	const char *key, int creat, mode_t m) {
+    strcpy(dir, fcfg->dir);
     strcat(dir, "/");
     strncat(dir, key, 1);
     if (creat) {
@@ -94,9 +94,7 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         return (-1);
     }
 
-    fcfg->dirlen = strlen(cfg->cache_cfg_str);
-    strncpy(fcfg->dir, cfg->cache_cfg_str, fcfg->dirlen);
-    fcfg->dir[fcfg->dirlen] = '\0';
+    strcpy(fcfg->dir, cfg->cache_cfg_str);
     cfg->cache_obj = fcfg;
 
     return (0);
@@ -111,6 +109,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         struct stat s;
         size_t valuelen, i = 0;
         int cachefd = -1;
+	char dir[PATH_MAX] = { 0 };
         struct file_cache_cfg *fcfg = cfg->cache_obj;
         if (pthread_mutex_init(&mtx, NULL) != 0) {
             da_cloud_log(cfg->efp, "could not lock", NULL);
@@ -120,7 +119,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         pthread_mutex_lock(&mtx);
 
         file_cache_setumask(&m);
-        if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 0, m) == -1) {
+        if (file_cache_mkdir(fcfg, dir, key, 0, m) == -1) {
             FILE_MTX_DISPOSE;
             return (-1);
         }
@@ -143,8 +142,8 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         if ((time_t)(s.st_mtime + cfg->expiration) <= time(NULL)) {
             fclose(cache);
             FILE_MTX_DISPOSE;
-            if (unlink(fcfg->dir) == - 1)
-                da_cloud_log(cfg->efp, "could not delete '%s' file", fcfg->dir, NULL);
+            if (unlink(dir) == - 1)
+                da_cloud_log(cfg->efp, "could not delete '%s' file", dir, NULL);
             return (-1);
         }
 
@@ -179,6 +178,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
         size_t i = 0;
         mode_t m;
         int cachefd = -1;
+	char dir[PATH_MAX] = { 0 };
         struct file_cache_cfg *fcfg = cfg->cache_obj;
         if (pthread_mutex_init(&mtx, NULL) != 0) {
             da_cloud_log(cfg->efp, "could not lock", NULL);
@@ -187,7 +187,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
 
         pthread_mutex_lock(&mtx);
         file_cache_setumask(&m);
-        if (file_cache_mkdir(fcfg->dir, fcfg->dirlen, key, 1, m) == -1) {
+        if (file_cache_mkdir(fcfg, dir, key, 1, m) == -1) {
             FILE_MTX_DISPOSE;
             return (0);
         }
