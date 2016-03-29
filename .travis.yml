@@ -16,13 +16,23 @@ addons:
 
 compiler:
   - gcc
+  - clang
 
 before_script: 
   - sudo apt-get update -qq
   - sudo apt-get install -qq libconfig-dev
   - sudo apt-get install -qq libjansson-dev
   - sudo apt-get install -qq libmemcached-dev
+  - sudo apt-get install -qq clang
   - cmake .
+
+before_install:
+  # ugly hack; if running a coverity scan abort all except the 1st build
+  # see note re gcc compiler above needing to be 1st
+  # also note that branch_pattern & the TRAVIS_BRANCH check must match
+  # unfortunately COVERITY_SCAN_BRANCH isn't defined until later in the
+  # build process
+  - if ([[ "${TRAVIS_JOB_NUMBER##*.}" != "1" ]] && [[ "${TRAVIS_BRANCH}" == "coverity_scan" ]]); then false ; fi
 
 script: 
   - make
