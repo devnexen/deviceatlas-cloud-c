@@ -126,7 +126,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     while ((server = config_setting_get_elem(servers, nservers)) != NULL) {
         struct da_cloud_server *s;
         const char *host;
-        int tmp;
+        int tmp = -1;
         unsigned short port = 80;
         if (config_setting_lookup_string(server, "host", &host) != CONFIG_TRUE) {
             da_cloud_log(config->efp, "%s: did not find host setting (%d)", confpath, (int)nservers, NULL);
