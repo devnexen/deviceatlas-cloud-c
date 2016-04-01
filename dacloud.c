@@ -112,8 +112,8 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         cache_set(&config->cops, cache_name);
         if (config->cops.init(&config->cache_cfg) == -1) {
             free(config->cache_cfg.cache_cfg_str);
-            config_destroy(&cfg);
             da_cloud_log(config->efp, "could not set %s cache", cache_name);
+            config_destroy(&cfg);
             return (-1);
         }
 

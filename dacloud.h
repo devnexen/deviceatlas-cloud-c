@@ -72,7 +72,7 @@ struct da_cloud_property {
     } value;
     enum da_cloud_property_type type;
     SLIST_ENTRY(da_cloud_property) entries;
-};
+} __attribute__((packed));
 
 struct da_cloud_property_head {
     /* can be 'cloud', 'cache' or 'none' */
