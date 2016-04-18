@@ -11,7 +11,7 @@
 #include "file_cache_provider.h"
 
 #define FILE_CACHE_ATTEMPT(mode)                        \
-    while ((cache = fopen(dir, mode)) == NULL) {  \
+    while ((cache = fopen(dir, mode)) == NULL) {        \
         usleep(1000000);                                \
         ++ i;                                           \
         if (i == 3)                                     \
