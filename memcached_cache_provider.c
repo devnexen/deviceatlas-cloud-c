@@ -17,7 +17,7 @@ memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
     cfg->cache_obj = NULL;
     cfg->data = memcached_create(NULL);
     if (cfg->data == NULL) {
-        da_cloud_log(cfg->efp, "could not allocated data structure");
+        da_cloud_log(cfg->efp, "could not allocate data structure");
         return (-1);
     }
 
