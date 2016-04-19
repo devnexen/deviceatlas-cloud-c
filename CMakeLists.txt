@@ -5,6 +5,9 @@ find_path(HAVE_CONFIG libconfig.h)
 find_path(HAVE_CURL curl/curl.h)
 find_path(HAVE_JANSSON jansson.h)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB2 glib-2.0)
+
 # memcached cache provider
 find_path(HAVE_MEMCACHED libmemcached/memcached.h)
 
@@ -31,6 +34,13 @@ if (NOT ${HAVE_MEMCACHED} STREQUAL "HAVE_MEMCACHED-NOTFOUND")
     find_library(MEMCACHED memcached)
     find_library(MEMCACHEDUTIL memcachedutil)
     set(CACHELIBS ${MEMCACHED} ${MEMCACHEDUTIL})
+endif()
+
+if (GLIB2_FOUND)
+    add_definitions(-DHAVE_GLIB)
+    message(STATUS "Glib / HashTable support")
+    include_directories(${GLIB2_INCLUDE_DIRS})
+    set(CACHELIBS ${CACHELIBS} ${GLIB2_LIBRARIES})
 endif()
 
 find_library(CONFIG config)

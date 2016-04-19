@@ -1,6 +1,6 @@
 /**
  *
- *  Copyright (C) 2015  David Carlier <devnexen@gmail.com>
+ *  Copyright (C) 2016  David Carlier <devnexen@gmail.com>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -16,24 +16,16 @@
  *  License along with this library.
  */
 
-#ifndef  CACHE_PROVIDERS_H
-#define  CACHE_PROVIDERS_H
-
-#include "file_cache_provider.h"
-
-#ifdef   HAVE_MEMCACHED
-#include "memcached_cache_provider.h"
-#endif
-
 #ifdef   HAVE_GLIB
-#include "memory_cache_provider.h"
+#ifndef  MEMORY_PROVIDER_H
+#define  MEMORY_PROVIDER_H
+#include "dacloud_cache.h"
+
+const char *memory_cache_id(void);
+int memory_cache_init(struct da_cloud_cache_cfg *);
+int memory_cache_get(struct da_cloud_cache_cfg *, const char *, char **);
+int memory_cache_set(struct da_cloud_cache_cfg *, const char *, const char *);
+void memory_cache_fini(struct da_cloud_cache_cfg *);
+
 #endif
-
-#define  CACHE_SET(cops, name)         	\
-    cops->id = name ## _cache_id;   \
-    cops->init = name ## _cache_init; 	\
-    cops->get = name ## _cache_get;     \
-    cops->set = name ## _cache_set;     \
-    cops->fini = name ## _cache_fini
-
 #endif

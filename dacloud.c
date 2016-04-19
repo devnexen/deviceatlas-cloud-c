@@ -107,17 +107,20 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     if (config_lookup_int(&cfg, "user.manual_ranking", &manual_ranking) == CONFIG_TRUE)
         config->manual_ranking = manual_ranking;
 
-    if (cache_name != NULL && cache_string != NULL) {
-        config->cache_cfg.cache_cfg_str = strdup(cache_string);
+    if (cache_name != NULL) {
+        if (cache_string != NULL)
+            config->cache_cfg.cache_cfg_str = strdup(cache_string);
         cache_set(&config->cops, cache_name);
         if (config->cops.init(&config->cache_cfg) == -1) {
-            free(config->cache_cfg.cache_cfg_str);
+            if (config->cache_cfg.cache_cfg_str != NULL)
+                free(config->cache_cfg.cache_cfg_str);
             da_cloud_log(config->efp, "could not set %s cache", cache_name);
             config_destroy(&cfg);
             return (-1);
         }
 
-        free(config->cache_cfg.cache_cfg_str);
+        if (config->cache_cfg.cache_cfg_str != NULL)
+            free(config->cache_cfg.cache_cfg_str);
     }
 
     if ((servers = config_lookup(&cfg, "servers")) == NULL)
