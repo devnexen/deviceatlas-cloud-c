@@ -25,9 +25,7 @@
 #include "memcached_cache_provider.h"
 #endif
 
-#ifdef   HAVE_GLIB
 #include "memory_cache_provider.h"
-#endif
 
 #define  CACHE_SET(cops, name)         	\
     cops->id = name ## _cache_id;   \

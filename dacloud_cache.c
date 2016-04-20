@@ -48,10 +48,8 @@ cache_set(struct da_cloud_cache_ops *cops, const char *cache_name) {
     } else if (strcasecmp(cache_name, "memcached") == 0) {
         CACHE_SET(cops, memcached);
 #endif
-#ifdef  HAVE_GLIB
     } else if (strcasecmp(cache_name, "memory") == 0) {
         CACHE_SET(cops, memory);
-#endif
     } else {
         errx(1, "%s cache invalid", cache_name);
     }

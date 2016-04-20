@@ -33,6 +33,7 @@ a/ Mandatories
 b/ Optional
 
 * LibMemcached (works with old 0.4.x versions as well).
+* Glib 2.
 
 3/ Examples
 ===========
