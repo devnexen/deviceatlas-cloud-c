@@ -9,7 +9,6 @@
 #define HASH_MIN            128
 
 #ifdef  HAVE_GLIB
-
 #include <glib.h>
 
 const char *
@@ -23,7 +22,7 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
     cfg->cache_obj = NULL;
     guint *threshold;
 
-    threshold = calloc(1, sizeof(*threshold));
+    threshold = malloc(sizeof(*threshold));
     if (threshold == NULL) {
         da_cloud_log(cfg->efp, "could not allocate threshold data");
         return (-1);
@@ -96,9 +95,7 @@ memory_cache_fini(struct da_cloud_cache_cfg *cfg) {
 }
 
 #else
-
 #include <sys/queue.h>
-#include <stdlib.h>
 
 struct memory_cache_entry {
     char *key;
@@ -135,7 +132,7 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
     int *threshold = NULL;
     cfg->cache_obj = NULL;
 
-    threshold = calloc(1, sizeof(*threshold));
+    threshold = malloc(sizeof(*threshold));
     if (threshold == NULL) {
         da_cloud_log(cfg->efp, "could not allocate threshold");
         return (-1);
@@ -199,7 +196,7 @@ memory_cache_set(struct da_cloud_cache_cfg *cfg, const char *key,
 
     if (cfg->cache_obj != NULL) {
         mc = cfg->cache_obj;
-        mce = calloc(1, sizeof(*mce));
+        mce = malloc(sizeof(*mce));
         mce->key = strdup(key);
         mce->value = strdup(value);
         TAILQ_INSERT_TAIL(&mc->entries, mce, entry);

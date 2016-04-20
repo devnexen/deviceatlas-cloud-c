@@ -6,7 +6,10 @@ find_path(HAVE_CURL curl/curl.h)
 find_path(HAVE_JANSSON jansson.h)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLIB2 glib-2.0)
+
+if (NOT NOGLIB2)
+    pkg_check_modules(GLIB2 glib-2.0)
+endif()
 
 # memcached cache provider
 find_path(HAVE_MEMCACHED libmemcached/memcached.h)

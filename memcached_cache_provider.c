@@ -1,5 +1,5 @@
-#ifdef   HAVE_MEMCACHED
 #include <string.h>
+#ifdef   HAVE_MEMCACHED
 
 #include <libmemcached/memcached.h>
 #include <libmemcached/util.h>
