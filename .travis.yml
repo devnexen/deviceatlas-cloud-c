@@ -4,13 +4,16 @@ language: c++
 env:
   global:
     - secure: "utqWsCDwRjodZr8hqSKmLBHjxAj5k4Gckox13YKQfsVkNLCTMCaPo8QKxzORwv24If7Tc4YhehNZx45g2tP7G2tptNx8X+O8l3vLFWWLVYyVbUTFoJe+QvuEqR0NlMoiiOl1tj3YTQFclD7olgNryHDJtWIzIWN+2UwN43s80bwQT7lXqgBwWgUBLLkypcOnd9jMIPBsvw0F9n0hKnyX5cEcnL/qUNw0+EDfZsnaNDY2miLroRCG3u7xrGTl4jxqokI3BFRzLqV1+fs6gwxxxDCIvLndkHOA/yywISNAQtNLzz9MTDoVsdKG0aWSZIZ9Qs+AcLbsC0d3clNnpGeNgJ6jWMW0G//5eJDhIxKfgvSJfEsXlrWWfCmEo/SpGQhysdrc2oN6vNTxIwvrgVa1cBvbpkF0HMk3ZfdXhaThclZ5cvdqpgWgngEyQAOeYVZRH3sWxBXwUSu+F+icyPH0J5ksvgtLvzLp364FKOjzyxzoGNoa7jQuv6RGwGjJOOzLRDQJZZ1KoeAT5qgERjUlOmODFLEcAfdu+7S4kgmPVxjLwCOiF1I9wjnWFLqnXnMpqCYCZ54YA1kBIooyAVpLAya4LWqSuQm42yNkh8kMSP2NGENBRsRvr9OufegJL7qMjRYtQVVxPfHiM+HdXPTnxdXzRndkf3zPdJjcMteG5wQ="
+  matrix:
+    - GLIB2=""
+    - GLIB2="-DNOGLIB2=1"
 
 addons:
   coverity_scan:
     project:
       name: devnexen/deviceatlas-cloud-c
     notification_email: devnexen@gmail.com
-    build_command_prepend: cmake .
+    build_command_prepend: cmake "$GLIB2"
     build_command: make
     branch_pattern: coverity_scan
 
@@ -25,7 +28,7 @@ before_script:
   - sudo apt-get install -qq libmemcached-dev
   - sudo apt-get install -qq libglib2.0-dev
   - sudo apt-get install -qq clang
-  - cmake .
+  - cmake "$GLIB2"
 
 before_install:
   # ugly hack; if running a coverity scan abort all except the 1st build
@@ -33,7 +36,7 @@ before_install:
   # also note that branch_pattern & the TRAVIS_BRANCH check must match
   # unfortunately COVERITY_SCAN_BRANCH isn't defined until later in the
   # build process
-  - if ([[ "${TRAVIS_JOB_NUMBER##*.}" != "1" ]] && [[ "${TRAVIS_BRANCH}" == "coverity_scan" ]]); then false ; fi
+  - if ([[ "${TRAVIS_JOB_NUMBER##*.}" != "1" ]] && [[ "${TRAVIS_JOB_NUMBER##*.}" != 3 ]] && [[ "${TRAVIS_BRANCH}" == "coverity_scan" ]]); then false ; fi
 
 script: 
   - make
