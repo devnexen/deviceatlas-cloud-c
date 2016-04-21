@@ -45,6 +45,9 @@ struct da_cloud_header_head {
     SLIST_HEAD(da_cloud_header_list, da_cloud_header) list;
 };
 
+#define da_list_init(h)        SLIST_INIT(h)
+#define da_list_foreach(p, h)  SLIST_FOREACH(p, h, entries)
+
 int da_cloud_header_init(struct da_cloud_header_head *);
 int da_cloud_header_add(struct da_cloud_header_head *, const char *, const char *);
 int da_cloud_clientside_add(struct da_cloud_header_head *, const char *);

@@ -285,9 +285,9 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     cacheval = NULL;
     _ret = -1;
     strcpy(phead->cachesource, "none");
-    SLIST_INIT(&phead->list);
+    da_list_init(&phead->list);
 
-    SLIST_FOREACH(h, &head->list, entries) {
+    da_list_foreach(h, &head->list) {
         size_t keylen = strlen(h->key);
         size_t valuelen = strlen(h->value);
         size_t cachekeybuflen = strlen(cachekeybuf);
@@ -312,7 +312,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     if (c == NULL)
         return (-1);
 
-    SLIST_FOREACH(h, &head->list, entries) {
+    da_list_foreach(h, &head->list) {
         char buf[256];
         snprintf(buf, sizeof(buf), DETECT_HDR_FORMAT, h->key, h->value);
         hd = curl_slist_append(hd, buf);

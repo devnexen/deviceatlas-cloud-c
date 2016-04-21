@@ -36,7 +36,7 @@ main(int argc, char *argv[]) {
         }
         if (da_cloud_detect(&config, &head, &phead) == 0) {
             struct da_cloud_property *p;
-            SLIST_FOREACH(p, &phead.list, entries) {
+            da_list_foreach(p, &phead.list) {
                 da_cloud_property_type type = p->type;
                 cout << p->name << ": ";
                 switch (type) {

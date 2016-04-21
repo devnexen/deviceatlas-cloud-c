@@ -42,7 +42,7 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
 
 int
 da_cloud_header_init(struct da_cloud_header_head *head) {
-    SLIST_INIT(&head->list);
+    da_list_init(&head->list);
 
     return (0);
 }

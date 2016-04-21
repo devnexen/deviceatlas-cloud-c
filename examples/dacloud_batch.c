@@ -9,7 +9,7 @@ static void
 print_headers(struct da_cloud_header_head hhead) {
     struct da_cloud_header *h;
     printf("\nHeaders used:\n");
-    SLIST_FOREACH(h, &hhead.list, entries) {
+    da_list_foreach(h, &hhead.list) {
         da_cloud_print_header(stderr, h);
     }
     printf("\n");
@@ -20,7 +20,7 @@ print_properties(struct da_cloud_property_head phead) {
     struct da_cloud_property *p;
     size_t i;
 	da_cloud_property_count(&phead, &i);
-    SLIST_FOREACH(p, &phead.list, entries) {
+    da_list_foreach(p, &phead.list) {
         da_cloud_print_property(stderr, p);
     }
     printf("source : %s\n", phead.cachesource);
