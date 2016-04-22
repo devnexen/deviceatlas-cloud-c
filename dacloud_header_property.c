@@ -63,8 +63,10 @@ da_cloud_header_add(struct da_cloud_header_head *head,
     dh->orig_key = dh->key + (sizeof(CLOUD_HEADER_PREFIX) - 1);
     dh->value = strdup(value);
     da_list_foreach(ddh, &head->list) {
-        if (strcmp(ddh->key, dh->key) == 0)
+        if (strcmp(ddh->key, dh->key) == 0) {
+            free(dh);
             return (-1);
+        }
     }
     SLIST_INSERT_HEAD(&head->list, dh, entries);
 
