@@ -300,10 +300,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         }
     }
 
-#define DACLOUD_CACHEKEY_SIZE       65
-    phead->cachekey = malloc(DACLOUD_CACHEKEY_SIZE * sizeof(char));
-    da_cloud_crypt_key(cachekeybuf, sizeof(cachekeybuf), phead->cachekey, DACLOUD_CACHEKEY_SIZE);
-    config->cops.get(&config->cache_cfg, phead->cachekey, &cacheval);
+    da_cloud_crypt_key(cachekeybuf, sizeof(cachekeybuf), head->cachekey, DACLOUD_CACHEKEY_SIZE);
+    config->cops.get(&config->cache_cfg, head->cachekey, &cacheval);
     if (cacheval != NULL) {
         strcpy(phead->cachesource, "cache");
         _ret = 0;
@@ -345,8 +343,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
                 goto end;
             }
 
-            if (config->cops.set(&config->cache_cfg, phead->cachekey, dr->buf) == -1)
-                da_cloud_log(config->efp, "could not cache %s", phead->cachekey, NULL);
+            if (config->cops.set(&config->cache_cfg, head->cachekey, dr->buf) == -1)
+                da_cloud_log(config->efp, "could not cache %s", head->cachekey, NULL);
 
             cacheval = strdup(dr->buf);
             strcpy(phead->cachesource, "cloud");

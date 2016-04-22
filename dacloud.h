@@ -29,6 +29,7 @@
 extern "C" {
 #endif
 
+#define DACLOUD_CACHEKEY_SIZE       65
 /**
  * HTTP headers list struct
  * fed by the consumer and used
@@ -42,6 +43,8 @@ struct da_cloud_header {
 };
 
 struct da_cloud_header_head {
+    /* keeping track of the cache key */
+    char *cachekey;
     SLIST_HEAD(da_cloud_header_list, da_cloud_header) list;
 };
 
@@ -80,7 +83,6 @@ struct da_cloud_property {
 struct da_cloud_property_head {
     /* can be 'cloud', 'cache' or 'none' */
     char cachesource[16];
-    char *cachekey;
     SLIST_HEAD(da_cloud_property_list, da_cloud_property) list;
 };
 

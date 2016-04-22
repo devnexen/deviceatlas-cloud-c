@@ -51,7 +51,7 @@ main(int argc, char *argv[]) {
                 }
 
                 printf("<p>Cache source:%s</p>\n", properties.cachesource);
-                printf("<p>Cache key:%s</p>\n", properties.cachekey);
+                printf("<p>Cache key:%s</p>\n", headers.cachekey);
                 da_cloud_properties_free(&properties);
             }
 

@@ -43,6 +43,9 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
 int
 da_cloud_header_init(struct da_cloud_header_head *head) {
     da_list_init(&head->list);
+    head->cachekey = malloc(DACLOUD_CACHEKEY_SIZE * sizeof(char));
+    if (head->cachekey == NULL)
+        return (-1);
 
     return (0);
 }
@@ -104,6 +107,9 @@ da_cloud_header_free(struct da_cloud_header_head *head) {
         free(dh);
         dh = SLIST_FIRST(&head->list);
     }
+
+    free(head->cachekey);
+    head->cachekey = NULL;
 }
 
 int
@@ -111,7 +117,7 @@ da_cloud_property(struct da_cloud_property_head *phead, const char *pname,
     struct da_cloud_property **prop) {
 	if (prop == NULL)
 		return (-1);
-	SLIST_FOREACH(*prop, &phead->list, entries) {
+	da_list_foreach(*prop, &phead->list) {
 		if (strcasecmp((*prop)->name, pname) == 0)
 			return (0);
 	}
@@ -128,7 +134,7 @@ da_cloud_property_count(struct da_cloud_property_head *phead, size_t *count) {
 	if (count == NULL)
 		return (-1);
 	*count = ct = 0;
-	SLIST_FOREACH(p, &phead->list, entries) {
+	da_list_foreach(p, &phead->list) {
 		ct ++;
 	}
 
@@ -150,5 +156,4 @@ da_cloud_properties_free(struct da_cloud_property_head *phead) {
     }
 
     memset(phead->cachesource, 0, sizeof(phead->cachesource));
-    free(phead->cachekey);
 }
