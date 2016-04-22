@@ -82,7 +82,7 @@ struct da_cloud_property {
 
 struct da_cloud_property_head {
     /* can be 'cloud', 'cache' or 'none' */
-    char cachesource[16];
+    char cachesource[8];
     SLIST_HEAD(da_cloud_property_list, da_cloud_property) list;
 };
 
