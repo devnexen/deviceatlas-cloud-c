@@ -55,6 +55,8 @@ da_cloud_header_add(struct da_cloud_header_head *head,
         const char *key, const char *value) {
 #define  CLOUD_HEADER_PREFIX     "X-DA-"
     size_t keylen;
+    char cachekeybuf[1024] = { 0 };
+    struct da_cloud_header *h;
     struct da_cloud_header *ddh, *dh = malloc(sizeof(*dh));
     if (dh == NULL)
         return (-1);
@@ -72,6 +74,20 @@ da_cloud_header_add(struct da_cloud_header_head *head,
         }
     }
     SLIST_INSERT_HEAD(&head->list, dh, entries);
+
+    da_list_foreach(h, &head->list) {
+        size_t keylen = strlen(h->key);
+        size_t valuelen = strlen(h->value);
+        size_t cachekeybuflen = strlen(cachekeybuf);
+        if ((sizeof(cachekeybuf) - cachekeybuflen) > (keylen + valuelen)) {
+            if (cachekeybuflen == 0)
+                strncpy(cachekeybuf, h->key, keylen);
+            else
+                strncat(cachekeybuf, h->key, keylen);
+            strncat(cachekeybuf, h->value, valuelen);
+        }
+    }
+    da_cloud_crypt_key(cachekeybuf, sizeof(cachekeybuf), head->cachekey, DACLOUD_CACHEKEY_SIZE);
 
     return (0);
 }

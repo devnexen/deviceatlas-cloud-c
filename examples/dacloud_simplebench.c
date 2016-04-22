@@ -13,9 +13,9 @@ main(int argc, char *argv[]) {
         return (-1);
     if (argc >= 3) {
         iterationstr = argv[2];
-        int tmp = strtol(iterationstr, 0, 10);
-        if (tmp > 0 && tmp < SHRT_MAX)
-            iterations = tmp;
+        long tmp = strtol(iterationstr, 0, 10);
+        if (tmp > 0 && tmp < INT_MAX)
+            iterations = (int)tmp;
     }
     configpath = argv[1];
     memset(&config, 0, sizeof(config));
