@@ -25,6 +25,7 @@ da_cloud_process_req(void *arg) {
     for (i = 0; i < req->iterations; i ++) {
         printf("thread %d (iteration %d) starts\n", req->tid, (i + 1));
         da_cloud_detect(&req->cfg, &hhead, &phead);
+        printf("thread %d cache key is %s\n", req->tid, hhead.cachekey);
         if (da_cloud_property(&phead, "id", &p) == 0)
             printf("thread %d (iteration %d): id is %ld\n", req->tid, (i + 1),
                     p->value.l);

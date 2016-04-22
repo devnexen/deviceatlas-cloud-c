@@ -43,7 +43,7 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
 int
 da_cloud_header_init(struct da_cloud_header_head *head) {
     da_list_init(&head->list);
-    head->cachekey = malloc(DACLOUD_CACHEKEY_SIZE * sizeof(char));
+    head->cachekey = calloc(1, DACLOUD_CACHEKEY_SIZE * sizeof(char));
     if (head->cachekey == NULL)
         return (-1);
 
