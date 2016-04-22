@@ -63,8 +63,8 @@ main(int argc, char *argv[]) {
 
         for (i = 0; i < THREADS; i ++)
             pthread_join(pt[i], NULL);
-    }
 
-    da_cloud_fini(&config);
+        da_cloud_fini(&config);
+    }
     return (0);
 }

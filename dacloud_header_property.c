@@ -52,7 +52,7 @@ da_cloud_header_add(struct da_cloud_header_head *head,
         const char *key, const char *value) {
 #define  CLOUD_HEADER_PREFIX     "X-DA-"
     size_t keylen;
-    struct da_cloud_header *dh = malloc(sizeof(*dh));
+    struct da_cloud_header *ddh, *dh = malloc(sizeof(*dh));
     if (dh == NULL)
         return (-1);
     keylen = strlen(key) + sizeof(CLOUD_HEADER_PREFIX);
@@ -62,6 +62,10 @@ da_cloud_header_add(struct da_cloud_header_head *head,
     *(dh->key + keylen) = 0;
     dh->orig_key = dh->key + (sizeof(CLOUD_HEADER_PREFIX) - 1);
     dh->value = strdup(value);
+    da_list_foreach(ddh, &head->list) {
+        if (strcmp(ddh->key, dh->key) == 0)
+            return (-1);
+    }
     SLIST_INSERT_HEAD(&head->list, dh, entries);
 
     return (0);
@@ -144,4 +148,5 @@ da_cloud_properties_free(struct da_cloud_property_head *phead) {
     }
 
     memset(phead->cachesource, 0, sizeof(phead->cachesource));
+    free(phead->cachekey);
 }

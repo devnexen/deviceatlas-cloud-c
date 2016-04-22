@@ -53,13 +53,13 @@ main(int argc, char *argv[]) {
                 }
                 cout << endl;
             }
-            cout << "source: " << phead.cachesource << endl;
             cout << "cache set: " << da_cloud_cache_id(&config) << endl;
+            cout << "cache source: " << phead.cachesource << endl;
+            cout << "cache key: " << phead.cachekey << endl;
             da_cloud_properties_free(&phead);
         }
         da_cloud_header_free(&head);
+        da_cloud_fini(&config);
     }
-
-    da_cloud_fini(&config);
     return (0);
 }

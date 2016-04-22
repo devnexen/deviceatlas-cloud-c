@@ -27,6 +27,7 @@ before_script:
   - sudo apt-get install -qq libjansson-dev
   - sudo apt-get install -qq libmemcached-dev
   - sudo apt-get install -qq libglib2.0-dev
+  - sudo apt-get install -qq libfcgi-dev
   - sudo apt-get install -qq clang
   - cmake "$GLIB2"
 

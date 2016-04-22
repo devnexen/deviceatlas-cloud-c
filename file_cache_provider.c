@@ -50,6 +50,7 @@ file_cache_mkdir(struct file_cache_cfg *fcfg, char *dir,
     }
     strcat(dir, "/");
     strcat(dir, key + 1);    
+    fprintf(stderr, "CACHE DIR IS %s\n", dir);
 
     return (0);
 }

@@ -273,7 +273,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     CURL *c;
     size_t i;
     int _ret;
-    char cachekeybuf[1024] = { 0 }, cachekey[65] = { 0 };
+    char cachekeybuf[1024] = { 0 };
     if (phead == NULL) {
         da_cloud_log(config->efp, "properties cannot be null", NULL);
         return (-1);
@@ -300,8 +300,10 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         }
     }
 
-    da_cloud_crypt_key(cachekeybuf, sizeof(cachekeybuf), cachekey, sizeof(cachekey));
-    config->cops.get(&config->cache_cfg, cachekey, &cacheval);
+#define DACLOUD_CACHEKEY_SIZE       65
+    phead->cachekey = malloc(DACLOUD_CACHEKEY_SIZE * sizeof(char));
+    da_cloud_crypt_key(cachekeybuf, sizeof(cachekeybuf), phead->cachekey, DACLOUD_CACHEKEY_SIZE);
+    config->cops.get(&config->cache_cfg, phead->cachekey, &cacheval);
     if (cacheval != NULL) {
         strcpy(phead->cachesource, "cache");
         _ret = 0;
@@ -343,8 +345,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
                 goto end;
             }
 
-            if (config->cops.set(&config->cache_cfg, cachekey, dr->buf) == -1)
-                da_cloud_log(config->efp, "could not cache %s", cachekey, NULL);
+            if (config->cops.set(&config->cache_cfg, phead->cachekey, dr->buf) == -1)
+                da_cloud_log(config->efp, "could not cache %s", phead->cachekey, NULL);
 
             cacheval = strdup(dr->buf);
             strcpy(phead->cachesource, "cloud");

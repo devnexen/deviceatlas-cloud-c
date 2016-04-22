@@ -8,3 +8,12 @@ target_link_libraries(dacloud_cppclient dacloud)
 add_definitions(-pthread)
 add_executable(dacloud_mt dacloud_mt.c)
 target_link_libraries(dacloud_mt pthread dacloud)
+
+find_path(FCGI fcgi_stdio.h)
+
+if (FCGI)
+    find_library(FCGILIB fcgi)
+    message(STATUS "Fcgi support")
+    add_executable(dacloud_fcgi dacloud_fcgi.c)
+    target_link_libraries(dacloud_fcgi ${FCGILIB} dacloud)
+endif()
