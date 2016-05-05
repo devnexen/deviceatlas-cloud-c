@@ -31,22 +31,8 @@ main(int argc, char *argv[]) {
             if (da_cloud_detect(&cfg, &headers, &properties) == 0) {
                 struct da_cloud_property *p;
                 da_list_foreach(p, &properties.list) {
-                    printf("<p>%s:", p->name);
-                    switch (p->type) {
-                    case DA_CLOUD_LONG:
-                    case DA_CLOUD_BOOL: {
-                        long lval = p->value.l;
-                        printf("%ld", lval);
-                        break;
-                    }
-                    case DA_CLOUD_STRING:
-                    case DA_CLOUD_UNKNOWN: {
-                        char *sval = p->value.s;
-                        printf("%s", sval);
-                        break;
-                    }
-                    }
-
+                    printf("<p>");
+                    da_cloud_print_property(stdin, p);
                     printf("</p>\n");
                 }
 
