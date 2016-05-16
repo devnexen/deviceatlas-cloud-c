@@ -5,6 +5,7 @@
 #include <libmemcached/util.h>
 
 #include "memcached_cache_provider.h"
+#include "dacloud_util.h"
 
 const char *
 memcached_cache_id(void) {
@@ -14,6 +15,7 @@ memcached_cache_id(void) {
 int
 memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
     memcached_server_st *servers;
+    int num_cores;
     cfg->cache_obj = NULL;
     cfg->data = memcached_create(NULL);
     if (cfg->data == NULL) {
@@ -22,9 +24,16 @@ memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
     }
 
     servers = memcached_servers_parse(cfg->cache_cfg_str);
-    memcached_server_push(cfg->data, servers);
-    cfg->cache_obj = memcached_pool_create(cfg->data, 1, 5);
-    memcached_server_free(servers);
+    if (servers == NULL) {
+        da_cloud_log(cfg->efp, "could not create server instance");
+        memcached_free((memcached_st *)cfg->data);
+        return (-1);
+    } else {
+        num_cores = dacloud_get_num_cores();
+        memcached_server_push(cfg->data, servers);
+        cfg->cache_obj = memcached_pool_create(cfg->data, 1, num_cores);
+        memcached_server_free(servers);
+    }
 
     return (0);
 }
