@@ -106,11 +106,11 @@ struct da_cloud_server_head {
 
 struct da_cloud_config {
     struct da_cloud_cache_cfg cache_cfg;
-    struct da_cloud_cache_ops cops;
     struct da_cloud_server_head *shead;
     FILE *efp;
     char *licence_key;
-    unsigned int manual_ranking: 1;
+    unsigned short manual_ranking: 1;
+    struct da_cloud_cache_ops cops;
 };
 
 /* Handy function to print a header in the related stream */
