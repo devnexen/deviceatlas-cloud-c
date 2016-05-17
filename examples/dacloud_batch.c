@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #include "dacloud.h"
+#include "dacloud_util.h"
 
 static void
 print_headers(struct da_cloud_header_head hhead) {
@@ -42,8 +43,7 @@ main(int argc, char *argv[]) {
         size_t i = 0;
         printf("default servers => %s\n", config.shead->dservers ? "yes" : "no");
         printf("manual ranking => %s\n", config.manual_ranking ? "yes" : "no");
-        for (i = 0; i < config.shead->nb; i ++)
-            da_cloud_print_server(stderr, config.shead->servers[i]);
+        da_cloud_servers_ranking(stderr, config);
         while ((fgets(buf, sizeof(buf), stdin))) {
             char *b;
             char *p = buf;

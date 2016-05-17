@@ -29,7 +29,7 @@ memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
         memcached_free((memcached_st *)cfg->data);
         return (-1);
     } else {
-        num_cores = dacloud_get_num_cores();
+        num_cores = da_cloud_get_num_cores();
         memcached_server_push(cfg->data, servers);
         cfg->cache_obj = memcached_pool_create(cfg->data, 1, num_cores);
         memcached_server_free(servers);
