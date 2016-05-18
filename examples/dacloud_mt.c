@@ -1,9 +1,10 @@
 #if defined(__linux__)
 #define _GNU_SOURCE
+#endif
 #include <pthread.h>
+#if defined(__linux__)
 #include <sched.h>
 #elif defined(__FreeBSD__)
-#include <pthread.h>
 #include <pthread_np.h>
 #endif
 #include <string.h>
