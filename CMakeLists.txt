@@ -67,7 +67,14 @@ set_target_properties(dacloud PROPERTIES SOVERSION 1.0)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
+include(CheckCXXCompilerFlag)
+
+check_cxx_compiler_flag("-std=c++11" HAS_CXX11)
+
 subdirs(examples)
+if (HAS_CXX11)
+    subdirs(wrappers)
+endif()
 
 if (NOT ${HAVE_CUNIT} STREQUAL "HAVE_CUNIT-NOTFOUND")
     find_library(CUNIT cunit)
