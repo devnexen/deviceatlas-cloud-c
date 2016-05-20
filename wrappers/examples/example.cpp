@@ -1,6 +1,5 @@
 #include "dacloud.hpp"
 
-#include <memory>
 #include <iostream>
 #include <sstream>
 

@@ -13,7 +13,7 @@ addons:
     project:
       name: devnexen/deviceatlas-cloud-c
     notification_email: devnexen@gmail.com
-    build_command_prepend: cmake "$GLIB2"
+    build_command_prepend: cmake "$GLIB2" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
     build_command: make
     branch_pattern: coverity_scan
 
@@ -29,7 +29,8 @@ before_script:
   - sudo apt-get install -qq libglib2.0-dev
   - sudo apt-get install -qq libfcgi-dev
   - sudo apt-get install -qq clang
-  - cmake "$GLIB2"
+  - sudo apt-get install -qq gcc-4.8 g++-4.8
+  - cmake "$GLIB2" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
 
 before_install:
   # ugly hack; if running a coverity scan abort all except the 1st build

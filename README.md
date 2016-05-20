@@ -43,3 +43,8 @@ b/ Optional
 - C++         : examples/dacloud_cppclient <configuration file path> <user-agent>
 - MultiThread : examples/dacloud_mt <configuration file path>
 - Benchmark   : examples/dacloud_simplebench <configuration file path> [ number of iterations, per default 1000 ]
+
+<a href="https://scan.coverity.com/projects/device-atlas-cloud-c">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/6557/badge.svg"/>
+</a>
