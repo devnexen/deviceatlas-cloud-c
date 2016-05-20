@@ -50,7 +50,6 @@ public:
 class DaCloud : public DaBase {
 private:
     struct da_cloud_config cfg;
-    struct da_cloud_server_head *servers;
     std::string cache_id = std::string("none");
 public:
     DaCloud(std::string &);

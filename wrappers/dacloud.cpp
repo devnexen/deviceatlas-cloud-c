@@ -1,5 +1,7 @@
 #include "dacloud.hpp"
 
+#include <cstring>
+
 Da::DaCloudHeaders::DaCloudHeaders()
 {
     int ret = da_cloud_header_init(&hhead);
@@ -52,6 +54,7 @@ Da::DaCloud::~DaCloud()
 
 Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, Da::DaCloudProperties &props)
 {
+    ::memset(&phead.list, 0, sizeof(phead.list));
     if (dc.IsSet() && header.IsSet() && !IsSet()) {
         struct da_cloud_header_head hhead = header.RealObject();
         props.clear();
