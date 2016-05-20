@@ -22,6 +22,7 @@ compiler:
   - clang
 
 before_script: 
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get install -qq libconfig-dev
   - sudo apt-get install -qq libjansson-dev
@@ -29,7 +30,8 @@ before_script:
   - sudo apt-get install -qq libglib2.0-dev
   - sudo apt-get install -qq libfcgi-dev
   - sudo apt-get install -qq clang
-  - sudo apt-get install -qq gcc-4.8 g++-4.8
+  - sudo apt-get install -qq gcc-4.8
+  - sudo apt-get install -qq g++-4.8
   - cmake "$GLIB2" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
 
 before_install:
