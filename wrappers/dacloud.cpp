@@ -52,10 +52,24 @@ Da::DaCloud::~DaCloud()
         da_cloud_fini(&cfg);
 }
 
+Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, struct da_cloud_property_head &_phead)
+{
+    ::memset(&phead.list, 0, sizeof(phead.list));
+    if (dc.IsSet() && header.IsSet()) {
+        struct da_cloud_header_head hhead = header.RealObject();
+        int ret = da_cloud_detect(&dc.Cfg(), &hhead, &phead);
+        if (ret == 0) {
+            cache_source = std::string(phead.cachesource);
+            cache_key = std::string(hhead.cachekey);
+        }
+    }
+    _phead = phead;
+}
+
 Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, Da::DaCloudProperties &props)
 {
     ::memset(&phead.list, 0, sizeof(phead.list));
-    if (dc.IsSet() && header.IsSet() && !IsSet()) {
+    if (dc.IsSet() && header.IsSet()) {
         struct da_cloud_header_head hhead = header.RealObject();
         props.clear();
         int ret = da_cloud_detect(&dc.Cfg(), &hhead, &phead);
@@ -68,7 +82,6 @@ Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, Da
                 props.insert(pr);
             }
         
-            SetSet(true);
             cache_source = std::string(phead.cachesource);
             cache_key = std::string(hhead.cachekey);
         }
@@ -77,6 +90,5 @@ Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, Da
 
 Da::DaCloudDetect::~DaCloudDetect()
 {
-    if (IsSet())
-        da_cloud_properties_free(&phead);
+    da_cloud_properties_free(&phead);
 }

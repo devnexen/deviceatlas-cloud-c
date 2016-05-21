@@ -60,13 +60,14 @@ public:
     const std::string &CacheId(void) const { return cache_id; } 
 };
 
-class DaCloudDetect : public DaBase {
+class DaCloudDetect {
 private:
     struct da_cloud_property_head phead;;
     std::string cache_key = std::string("none");
     std::string cache_source = std::string("none");
 public:
     DaCloudDetect() = delete;
+    DaCloudDetect(DaCloud &, DaCloudHeaders &, struct da_cloud_property_head &);
     DaCloudDetect(DaCloud &, DaCloudHeaders &, DaCloudProperties &);
     ~DaCloudDetect();
     const std::string &CacheKey(void) const { return cache_key; }
