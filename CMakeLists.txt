@@ -73,7 +73,7 @@ check_cxx_compiler_flag("-std=c++11" HAS_CXX11)
 
 subdirs(examples)
 if (HAS_CXX11)
-    subdirs(wrappers)
+    subdirs(cppwrapper)
 endif()
 
 if (NOT ${HAVE_CUNIT} STREQUAL "HAVE_CUNIT-NOTFOUND")
