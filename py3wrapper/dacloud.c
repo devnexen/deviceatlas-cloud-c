@@ -3,6 +3,7 @@
 #include "dacloud.h"
 
 typedef struct {
+    PyObject_HEAD;
     struct da_cloud_config cfg;
     unsigned int set:1;
 } DaCloudObject;
@@ -21,23 +22,29 @@ static PyMethodDef dacloudmod_methods[] = {
 
 static struct PyModuleDef dacloudmod_module = {
     PyModuleDef_HEAD_INIT,
-    "dacloudmod",
+    "dacloud",
     0,
     -1,
     NULL
 };
 
 PyMODINIT_FUNC
-PyInit_dacloudmod(void)
+PyInit_dacloud(void)
 {
     PyObject *m;
     m = PyModule_Create(&dacloudmod_module);
     if (m == NULL)
         return NULL;
 
+    dacloudmod_type.tp_new = PyType_GenericNew;
+    Py_INCREF(&dacloudmod_type);
+    if (PyType_Ready(&dacloudmod_type) < 0)
+        return NULL;
+
     dacloudmod_error = PyErr_NewException("dacloudmod.error", NULL, NULL);
     Py_INCREF(dacloudmod_error);
     PyModule_AddObject(m, "error", dacloudmod_error);
+    PyModule_AddObject(m, "DaCloud", (PyObject *)&dacloudmod_type);
     return m;   
 }
 
@@ -63,13 +70,15 @@ dacloudmod_load_config(PyObject *_self, PyObject *args)
 
     if (self->set == 0 && da_cloud_init(&self->cfg, configpath) == 0)
         self->set = 1;
+
+    return PyBool_FromLong((self->set == 1));
 }
 
 static PyObject *
 dacloudmod_detect(PyObject *_self, PyObject *args)
 {
     PyObject *headers, *props, *hkey, *hvalue;
-    Py_ssize_t headerssize, i;
+    Py_ssize_t headerssize, i = 0;
     DaCloudObject *self = (DaCloudObject *)_self;
 
     struct da_cloud_header_head hhead;
@@ -91,7 +100,7 @@ dacloudmod_detect(PyObject *_self, PyObject *args)
     if ((headerssize = PyDict_Size(headers)) == 0)
         return props;
 
-    da_list_init(&hhead.list);
+    da_cloud_header_init(&hhead);
 
     while (PyDict_Next(headers, &i, &hkey, &hvalue) == 1) {
         char *hn = NULL, *hv = NULL;
@@ -148,7 +157,7 @@ dacloudmod_getattro(DaCloudObject *self, PyObject *name)
 
 static PyTypeObject dacloudmod_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "dacloudmod.DaCloud",
+    "dacloud.DaCloud",
     sizeof(DaCloudObject),
     0,
     (destructor)dacloudmod_dealloc,

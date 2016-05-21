@@ -50,6 +50,8 @@ cache_set(struct da_cloud_cache_ops *cops, const char *cache_name) {
 #endif
     } else if (strcasecmp(cache_name, "memory") == 0) {
         CACHE_SET(cops, memory);
+    } else if (strcasecmp(cache_name, "mock") == 0) {
+        CACHE_SET(cops, mock);
     } else {
         errx(1, "%s cache invalid", cache_name);
     }

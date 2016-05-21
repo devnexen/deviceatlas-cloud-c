@@ -30,8 +30,9 @@ before_script:
   - sudo apt-get install -qq libglib2.0-dev
   - sudo apt-get install -qq libfcgi-dev
   - sudo apt-get install -qq clang
-  - sudo apt-get install -qq gcc-4.8
-  - sudo apt-get install -qq g++-4.8
+  - sudo apt-get install -qq gcc-4.8 -y
+  - sudo apt-get install -qq g++-4.8 -y
+  - sudo apt-get install -qq python3
   - cmake "$GLIB2" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
 
 before_install:
@@ -44,3 +45,5 @@ before_install:
 
 script: 
   - make
+  - cd py3wrapper
+  - CC=gcc-4.8 CFLAGS="-I.." LDFLAGS="-L.." python3 setup.py build_ext
