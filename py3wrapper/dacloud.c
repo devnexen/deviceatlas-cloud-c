@@ -13,10 +13,12 @@ static PyTypeObject dacloudmod_type;
 
 static PyObject *dacloudmod_load_config(PyObject *, PyObject *);
 static PyObject *dacloudmod_detect(PyObject *, PyObject *);
+static PyObject *dacloudmod_cache_id(PyObject *, PyObject *);
 
 static PyMethodDef dacloudmod_methods[] = {
     { "load_config", dacloudmod_load_config, METH_VARARGS, NULL },
     { "detect", dacloudmod_detect, METH_VARARGS, NULL },
+    { "cache_id", dacloudmod_cache_id, 0, NULL },
     { NULL, NULL, 0, NULL }
 };
 
@@ -141,12 +143,28 @@ dacloudmod_detect(PyObject *_self, PyObject *args)
             }   
         }
 
+        PyDict_SetItemString(props, "__cachesource", PyUnicode_FromString(phead.cachesource));
+        PyDict_SetItemString(props, "__cachekey", PyUnicode_FromString(hhead.cachekey));
+
         da_cloud_properties_free(&phead);
     }
 
     da_cloud_header_free(&hhead);
 
     return props;
+}
+
+static PyObject *
+dacloudmod_cache_id(PyObject *_self, PyObject *args)
+{
+    DaCloudObject *self = (DaCloudObject *)_self;
+    if (self->set == 0) {
+        PyErr_SetString(dacloudmod_error, "cache_id call, configuration not set");
+        return NULL;
+    } else {
+        const char *cache_id = da_cloud_cache_id(&self->cfg);
+        return PyUnicode_FromString(cache_id);
+    }
 }
 
 static PyObject *

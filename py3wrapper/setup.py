@@ -5,7 +5,8 @@ import sys
 if sys.version_info[0] < 3:
     raise "Python 3 only is supported"
 
-cflags = ldflags = ''
+cflags = '.'
+ldflags = ''
 
 if 'CFLAGS' in os.environ:
     cflags = os.environ['CFLAGS']
