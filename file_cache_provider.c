@@ -109,7 +109,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         struct stat s;
         size_t valuelen, i = 0;
         int cachefd = -1;
-	char dir[PATH_MAX] = { 0 };
+        char dir[PATH_MAX] = { 0 };
         struct file_cache_cfg *fcfg = cfg->cache_obj;
         if (pthread_mutex_init(&mtx, NULL) != 0) {
             da_cloud_log(cfg->efp, "could not lock", NULL);
@@ -178,7 +178,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
         size_t i = 0;
         mode_t m;
         int cachefd = -1;
-	char dir[PATH_MAX] = { 0 };
+        char dir[PATH_MAX] = { 0 };
         struct file_cache_cfg *fcfg = cfg->cache_obj;
         if (pthread_mutex_init(&mtx, NULL) != 0) {
             da_cloud_log(cfg->efp, "could not lock", NULL);
