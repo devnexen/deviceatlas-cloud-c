@@ -45,6 +45,16 @@ b/ Optional
 - MultiThread : examples/dacloud_mt <configuration file path>
 - Benchmark   : examples/dacloud_simplebench <configuration file path> [ number of iterations, per default 1000 ]
 
+4/ Wrappers
+===========
+
+- The C++ wrapper is provided with one example with both mono and multithread usage
+- examples/example <configuration file path>
+- The Python wrapper needs to be compiled as follow
+- CFLAGS=... LDFLAGS=... python setup.py build
+- A basic example is provided inside examples subfolder
+
+
 <a href="https://scan.coverity.com/projects/device-atlas-cloud-c">
   <img alt="Coverity Scan Build Status"
        src="https://scan.coverity.com/projects/6557/badge.svg"/>
