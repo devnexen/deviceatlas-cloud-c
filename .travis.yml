@@ -7,7 +7,6 @@ env:
   matrix:
     - GLIB2=""
     - GLIB2="-DNOGLIB2=1"
-    - FILEMMAP=""
     - FILEMMAP="-DFILE_CACHE_MMAP=1"
 
 addons:
@@ -43,7 +42,7 @@ before_install:
   # also note that branch_pattern & the TRAVIS_BRANCH check must match
   # unfortunately COVERITY_SCAN_BRANCH isn't defined until later in the
   # build process
-  - if ([[ "${TRAVIS_JOB_NUMBER##*.}" != "1" ]] && [[ "${TRAVIS_JOB_NUMBER##*.}" != 3 ]] && [[ "${TRAVIS_BRANCH}" == "coverity_scan" ]]); then false ; fi
+  - if ([[ "${TRAVIS_JOB_NUMBER##*.}" != "1" ]] && [[ "${TRAVIS_JOB_NUMBER##*.}" != "3" ]] && [[ "${TRAVIS_JOB_NUMBER##*.}" != "5" ]] && [[ "${TRAVIS_BRANCH}" == "coverity_scan" ]]); then false ; fi
 
 script: 
   - make
