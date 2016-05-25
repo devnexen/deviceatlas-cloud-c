@@ -183,7 +183,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         char *region = mmap(NULL, valuelen + 1, PROT_READ, MAP_SHARED, cachefd, 0);
         if (region == ((void *)-1)) {
             close(cachefd);
-            da_cloud_log(cfg->efp, "could not read the cache content", NULL);
+            da_cloud_log(cfg->efp, "could not read the cache data '%s'", strerror(errno));
             return (-1);
         }
 
