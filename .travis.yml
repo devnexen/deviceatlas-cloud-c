@@ -7,13 +7,15 @@ env:
   matrix:
     - GLIB2=""
     - GLIB2="-DNOGLIB2=1"
+    - FILEMMAP=""
+    - FILEMMAP="-DFILE_CACHE_MMAP=1"
 
 addons:
   coverity_scan:
     project:
       name: devnexen/deviceatlas-cloud-c
     notification_email: devnexen@gmail.com
-    build_command_prepend: cmake "$GLIB2" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
+    build_command_prepend: cmake "$GLIB2" "$FILEMMAP" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
     build_command: make
     branch_pattern: coverity_scan
 
@@ -33,7 +35,7 @@ before_script:
   - sudo apt-get install -qq gcc-4.8 -y
   - sudo apt-get install -qq g++-4.8 -y
   - sudo apt-get install -qq python3
-  - cmake "$GLIB2" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
+  - cmake "$GLIB2" "$FILEMMAP" -DCMAKE_C_COMPILER=gcc-4.8 -DCMAKE_CXX_COMPILER=g++-4.8
 
 before_install:
   # ugly hack; if running a coverity scan abort all except the 1st build

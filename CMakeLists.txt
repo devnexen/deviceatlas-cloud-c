@@ -48,6 +48,11 @@ else()
     message(STATUS "Memory cache (Simple Tail Queue) support")
 endif()
 
+if (FILE_CACHE_MMAP)
+    add_definitions(-DFILE_CACHE_MMAP=1)
+    message(STATUS "File cache (MMAP) support")
+endif()
+
 find_library(CONFIG config)
 find_library(CURL curl)
 find_library(JANSSON jansson)
