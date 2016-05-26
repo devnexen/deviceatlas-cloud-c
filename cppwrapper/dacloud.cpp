@@ -55,6 +55,7 @@ Da::DaCloud::~DaCloud()
 Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, struct da_cloud_property_head &_phead)
 {
     ::memset(&phead.list, 0, sizeof(phead.list));
+    phead.dcm = nullptr;
     if (dc.IsSet() && header.IsSet()) {
         struct da_cloud_header_head hhead = header.RealObject();
         int ret = da_cloud_detect(&dc.Cfg(), &hhead, &phead);
@@ -69,6 +70,7 @@ Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, st
 Da::DaCloudDetect::DaCloudDetect(Da::DaCloud &dc, Da::DaCloudHeaders &header, Da::DaCloudProperties &props)
 {
     ::memset(&phead.list, 0, sizeof(phead.list));
+    phead.dcm = nullptr;
     if (dc.IsSet() && header.IsSet()) {
         struct da_cloud_header_head hhead = header.RealObject();
         props.clear();

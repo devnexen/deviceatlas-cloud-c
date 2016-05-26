@@ -63,7 +63,7 @@ public:
 
 class DaCloudDetect {
 private:
-    struct da_cloud_property_head phead;;
+    struct da_cloud_property_head phead;
     std::string cache_key = std::string("none");
     std::string cache_source = std::string("none");
 public:
