@@ -23,10 +23,12 @@
 #include <stdio.h>
 
 struct da_cloud_config;
+struct da_cloud_mem;
 
 struct da_cloud_cache_cfg {
     void *data;
     void *cache_obj;
+    struct da_cloud_mem *cache_dcm;
     FILE *efp;
     char *cache_cfg_str;
     size_t expiration;

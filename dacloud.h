@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "dacloud_cache.h"
+#include "dacloud_mem.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,6 +84,7 @@ struct da_cloud_property {
 struct da_cloud_property_head {
     /* can be 'cloud', 'cache' or 'none' */
     char cachesource[8];
+    struct da_cloud_mem *dcm;
     SLIST_HEAD(da_cloud_property_list, da_cloud_property) list;
 };
 

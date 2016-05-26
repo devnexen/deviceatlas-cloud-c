@@ -20,6 +20,7 @@
 #define  CACHE_PROVIDERS_H
 
 #include "file_cache_provider.h"
+#include "dacloud_mem.h"
 
 #ifdef   HAVE_MEMCACHED
 #include "memcached_cache_provider.h"

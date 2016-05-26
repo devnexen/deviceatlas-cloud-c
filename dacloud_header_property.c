@@ -164,12 +164,10 @@ da_cloud_properties_free(struct da_cloud_property_head *phead) {
     struct da_cloud_property *p = SLIST_FIRST(&phead->list);
     while (!SLIST_EMPTY(&phead->list)) {
         SLIST_REMOVE_HEAD(&phead->list, entries);
-        if (p->type == DA_CLOUD_STRING || p->type == DA_CLOUD_UNKNOWN)
-            free(p->value.s);
-        free(p->name);
-        free(p);
         p = SLIST_FIRST(&phead->list);
     }
+
+    da_cloud_mem_free(phead->dcm);
 
     memset(phead->cachesource, 0, sizeof(phead->cachesource));
 }

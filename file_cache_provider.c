@@ -166,7 +166,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         valuelen = ftell(cache);
         rewind(cache);
 
-        *value = malloc(sizeof(char) * valuelen + 1);
+        *value = da_cloud_mem_alloc(cfg->cache_dcm, sizeof(char) * valuelen + 1);
         fgets(*value, valuelen + 1, cache);
         flock(cachefd, LOCK_UN);
         fclose(cache);

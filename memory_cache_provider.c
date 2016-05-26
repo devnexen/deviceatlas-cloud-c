@@ -113,9 +113,6 @@ memory_cache_removeall(struct memory_cache *mc) {
     struct memory_cache_entry *mce = TAILQ_FIRST(&mc->entries);
     while (!TAILQ_EMPTY(&mc->entries)) {
         TAILQ_REMOVE(&mc->entries, mce, entry);
-        free(mce->value);
-        free(mce->key);
-        free(mce);
         mce = TAILQ_FIRST(&mc->entries);
     }
 }
@@ -178,7 +175,7 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key,
         TAILQ_FOREACH(mce, &mc->entries, entry) {
             if (strcmp(key, mce->key) == 0) {
                 ret = 0;
-                *value = strdup(mce->value);
+                *value = da_cloud_mem_strdup(cfg->cache_dcm, mce->value);
                 break;
             }
         }
@@ -196,9 +193,9 @@ memory_cache_set(struct da_cloud_cache_cfg *cfg, const char *key,
 
     if (cfg->cache_obj != NULL) {
         mc = cfg->cache_obj;
-        mce = malloc(sizeof(*mce));
-        mce->key = strdup(key);
-        mce->value = strdup(value);
+        mce = da_cloud_mem_alloc(cfg->cache_dcm, sizeof(*mce));
+        mce->key = da_cloud_mem_strdup(cfg->cache_dcm, key);
+        mce->value = da_cloud_mem_strdup(cfg->cache_dcm, value);
         TAILQ_INSERT_TAIL(&mc->entries, mce, entry);
         mc->cnt ++;
         ret = 0;
