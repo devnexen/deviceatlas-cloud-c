@@ -5,6 +5,7 @@
 typedef struct {
     PyObject_HEAD;
     struct da_cloud_config cfg;
+    PyObject *cache_id;
     unsigned int set:1;
 } DaCloudObject;
 
@@ -18,7 +19,7 @@ static PyObject *dacloudmod_cache_id(PyObject *, PyObject *);
 static PyMethodDef dacloudmod_methods[] = {
     { "load_config", dacloudmod_load_config, METH_VARARGS, NULL },
     { "detect", dacloudmod_detect, METH_VARARGS, NULL },
-    { "cache_id", dacloudmod_cache_id, 0, NULL },
+    { "cache_id", dacloudmod_cache_id, METH_NOARGS, NULL },
     { NULL, NULL, 0, NULL }
 };
 
@@ -54,8 +55,12 @@ static void
 dacloudmod_dealloc(PyObject *_self)
 {
     DaCloudObject *self = (DaCloudObject *)_self;
-    if (self->set == 1)
+    if (self->set == 1) {
+        Py_DECREF(self->cache_id);
         da_cloud_fini(&self->cfg);
+    }
+    Py_DECREF(dacloudmod_error);
+    Py_DECREF(&dacloudmod_type);
     PyObject_Del(self);
 }
 
@@ -70,8 +75,11 @@ dacloudmod_load_config(PyObject *_self, PyObject *args)
         return NULL;
     }
 
-    if (self->set == 0 && da_cloud_init(&self->cfg, configpath) == 0)
+    if (self->set == 0 && da_cloud_init(&self->cfg, configpath) == 0) {
+        const char *cache_id = da_cloud_cache_id(&self->cfg);
+        self->cache_id = PyUnicode_FromString(cache_id);
         self->set = 1;
+    }
 
     return PyBool_FromLong((self->set == 1));
 }
@@ -120,31 +128,47 @@ dacloudmod_detect(PyObject *_self, PyObject *args)
             continue;
 
         da_cloud_header_add(&hhead, hn, hv);
+        Py_DECREF(hv);
+        Py_DECREF(hn);
     }
 
     if (da_cloud_detect(&self->cfg, &hhead, &phead) == 0) {
+        PyObject *cs, *ck;
         da_list_foreach(p, &phead.list) {
+            PyObject *v;
             switch (p->type) {
             case DA_CLOUD_BOOL: {
                 long value = p->value.l;
-                PyDict_SetItemString(props, p->name, PyBool_FromLong(value));
+                v = PyBool_FromLong(value);
+                PyDict_SetItemString(props, p->name, v);
                 break;
             }
             case DA_CLOUD_LONG: {
                 long value = p->value.l;
-                PyDict_SetItemString(props, p->name, PyLong_FromLong(value));
+                v = PyLong_FromLong(value);
+                PyDict_SetItemString(props, p->name, v);
                 break;
             }
             default: {
                 const char *value = p->value.s;
-                PyDict_SetItemString(props, p->name, PyUnicode_FromString(value));
+                v = PyUnicode_FromString(value);
+                PyDict_SetItemString(props, p->name, v);
                 break;
             }    
             }   
+
+            PyDict_SetItemString(props, p->name, v);
+            Py_DECREF(v);
         }
 
-        PyDict_SetItemString(props, "__cachesource", PyUnicode_FromString(phead.cachesource));
-        PyDict_SetItemString(props, "__cachekey", PyUnicode_FromString(hhead.cachekey));
+        cs = PyUnicode_FromString(phead.cachesource);
+        ck = PyUnicode_FromString(hhead.cachekey);
+
+        PyDict_SetItemString(props, "__cachesource", cs);
+        PyDict_SetItemString(props, "__cachekey", ck);
+
+        Py_DECREF(cs);
+        Py_DECREF(ck);
 
         da_cloud_properties_free(&phead);
     }
@@ -162,9 +186,8 @@ dacloudmod_cache_id(PyObject *_self, PyObject *args)
         PyErr_SetString(dacloudmod_error, "cache_id call, configuration not set");
         return NULL;
     } else {
-        const char *cache_id = da_cloud_cache_id(&self->cfg);
-        return PyUnicode_FromString(cache_id);
     }
+    return self->cache_id;
 }
 
 static PyObject *
