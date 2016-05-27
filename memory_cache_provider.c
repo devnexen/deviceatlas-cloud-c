@@ -68,7 +68,9 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) 
         g_key = key;
         g_value	= g_hash_table_lookup(cfg->cache_obj, g_key);
         if (g_value != NULL) {
-            *value = da_cloud_membuf_strdup(&cfg->cache_dcm, (char *)g_value);
+            char *svalue = strdup(g_value);
+            *value = da_cloud_membuf_strdup(&cfg->cache_dcm, svalue);
+            free(svalue);
             ret = 0;
         }
     }
@@ -222,7 +224,7 @@ memory_cache_fini(struct da_cloud_cache_cfg *cfg) {
         memory_cache_removeall(mc);
     }
 
-    da_cloud_mem_free(cfg->cache_root);
+    da_cloud_membuf_free(cfg->cache_root);
 }
 
 #endif
