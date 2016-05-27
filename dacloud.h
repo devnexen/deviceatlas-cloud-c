@@ -46,6 +46,8 @@ struct da_cloud_header {
 struct da_cloud_header_head {
     /* keeping track of the cache key */
     char *cachekey;
+    struct da_cloud_membuf *root;
+    struct da_cloud_membuf *dcm;
     SLIST_HEAD(da_cloud_header_list, da_cloud_header) list;
 };
 
@@ -84,7 +86,8 @@ struct da_cloud_property {
 struct da_cloud_property_head {
     /* can be 'cloud', 'cache' or 'none' */
     char cachesource[8];
-    struct da_cloud_mem *dcm;
+    struct da_cloud_membuf *root;
+    struct da_cloud_membuf *dcm;
     SLIST_HEAD(da_cloud_property_list, da_cloud_property) list;
 };
 

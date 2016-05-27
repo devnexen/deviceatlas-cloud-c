@@ -29,6 +29,12 @@ memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
         memcached_free((memcached_st *)cfg->data);
         return (-1);
     } else {
+        cfg->cache_dcm = da_cloud_membuf_create(1024 * 2);
+        if (cfg->cache_dcm == NULL) {
+            da_cloud_log(cfg->efp, "could not allocate mem pool");
+            return (-1);
+        }
+        cfg->cache_root = cfg->cache_dcm;
         num_cores = da_cloud_get_num_cores();
         memcached_server_push(cfg->data, servers);
         cfg->cache_obj = memcached_pool_create(cfg->data, 1, num_cores);
@@ -47,9 +53,14 @@ memcached_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **valu
         uint32_t flags;
         client = memcached_pool_pop(cfg->cache_obj, 1, &ret);
 
-        if (ret == MEMCACHED_SUCCESS)
-            *value = memcached_get(client, key, strlen(key),
+        if (ret == MEMCACHED_SUCCESS) {
+            char *svalue = memcached_get(client, key, strlen(key),
                     &vlen, &flags, &ret);
+            if (svalue != NULL) {
+                *value = da_cloud_membuf_strdup(&cfg->cache_dcm, svalue);
+                free(svalue);
+            }
+        }
         memcached_pool_push(cfg->cache_obj, client);
     }
 
@@ -78,6 +89,8 @@ memcached_cache_fini(struct da_cloud_cache_cfg *cfg) {
         memcached_free((memcached_st *)cfg->data);
         memcached_pool_destroy((memcached_pool_st *)cfg->cache_obj);
     }
+
+    da_cloud_membuf_free(cfg->cache_root);
 }
 
 #endif

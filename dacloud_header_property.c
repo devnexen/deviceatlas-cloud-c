@@ -43,7 +43,10 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
 int
 da_cloud_header_init(struct da_cloud_header_head *head) {
     da_list_init(&head->list);
-    head->cachekey = calloc(1, DACLOUD_CACHEKEY_SIZE * sizeof(char));
+    head->dcm = da_cloud_membuf_create(DACLOUD_CACHEKEY_SIZE + (1024 * 2));
+    head->root = head->dcm;
+    head->cachekey = da_cloud_membuf_alloc(&head->dcm,
+            DACLOUD_CACHEKEY_SIZE * sizeof(char));
     if (head->cachekey == NULL)
         return (-1);
 
@@ -57,19 +60,20 @@ da_cloud_header_add(struct da_cloud_header_head *head,
     size_t keylen;
     char cachekeybuf[1024] = { 0 };
     struct da_cloud_header *h;
-    struct da_cloud_header *ddh, *dh = malloc(sizeof(*dh));
+    struct da_cloud_header *ddh, *dh = da_cloud_membuf_alloc(&head->dcm,
+            sizeof(*dh));
     if (dh == NULL)
         return (-1);
     keylen = strlen(key) + sizeof(CLOUD_HEADER_PREFIX);
-    dh->key = malloc(sizeof(char) * keylen + sizeof(CLOUD_HEADER_PREFIX) + 1);
+    dh->key = da_cloud_membuf_alloc(&head->dcm,
+            sizeof(char) * keylen + sizeof(CLOUD_HEADER_PREFIX) + 1);
     strncpy(dh->key, CLOUD_HEADER_PREFIX, sizeof(CLOUD_HEADER_PREFIX));
     strncat(dh->key, key, keylen);
     *(dh->key + keylen) = 0;
     dh->orig_key = dh->key + (sizeof(CLOUD_HEADER_PREFIX) - 1);
-    dh->value = strdup(value);
+    dh->value = da_cloud_membuf_strdup(&head->dcm, value);
     da_list_foreach(ddh, &head->list) {
         if (strcmp(ddh->key, dh->key) == 0) {
-            free(dh);
             return (-1);
         }
     }
@@ -118,14 +122,10 @@ da_cloud_header_free(struct da_cloud_header_head *head) {
     struct da_cloud_header *dh = SLIST_FIRST(&head->list);
     while (!SLIST_EMPTY(&head->list)) {
         SLIST_REMOVE_HEAD(&head->list, entries);
-        free(dh->value);
-        free(dh->key);
-        free(dh);
         dh = SLIST_FIRST(&head->list);
     }
 
-    free(head->cachekey);
-    head->cachekey = NULL;
+    da_cloud_membuf_free(head->root);
 }
 
 int
@@ -167,7 +167,7 @@ da_cloud_properties_free(struct da_cloud_property_head *phead) {
         p = SLIST_FIRST(&phead->list);
     }
 
-    da_cloud_mem_free(phead->dcm);
+    da_cloud_membuf_free(phead->root);
 
     memset(phead->cachesource, 0, sizeof(phead->cachesource));
 }

@@ -99,7 +99,13 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         return (-1);
     }
 
-    fcfg = malloc(sizeof(*fcfg));
+    cfg->cache_dcm = da_cloud_membuf_create(1024 * 2);
+    if (cfg->cache_dcm == NULL) {
+        da_cloud_log(cfg->efp, "could not allocate mem pool", NULL);
+        return (-1);
+    }
+    cfg->cache_root = cfg->cache_dcm;
+    fcfg = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(*fcfg));
     if (fcfg == NULL) {
         da_cloud_log(cfg->efp, "could not allocate data structure", NULL);
         return (-1);
@@ -166,7 +172,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         valuelen = ftell(cache);
         rewind(cache);
 
-        *value = da_cloud_mem_alloc(cfg->cache_dcm, sizeof(char) * valuelen + 1);
+        *value = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(char) * valuelen + 1);
         fgets(*value, valuelen + 1, cache);
         flock(cachefd, LOCK_UN);
         fclose(cache);
@@ -194,7 +200,7 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
             return (-1);
         }
 
-        *value = strdup(region);
+        *value = da_cloud_membuf_strdup(&cfg->dcm, region);
         munmap(region, valuelen);
         close(cachefd);
 #endif
@@ -283,6 +289,5 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
 
 void
 file_cache_fini(struct da_cloud_cache_cfg *cfg) {
-    if (cfg->cache_obj != NULL)
-        free(cfg->cache_obj);
+    da_cloud_membuf_free(cfg->cache_root);
 }

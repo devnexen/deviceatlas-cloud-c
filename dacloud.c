@@ -264,7 +264,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         struct da_cloud_property_head *phead) {
 #define  DETECT_URL_FORMAT "%s:%d/v1/detect/properties?licenceKey=%s"
 #define  DETECT_HDR_FORMAT "%s: %s"
-#define  DETECT_MEMSIZE    1024 * 12
+#define  DETECT_MEMSIZE    1024 * 1
     struct da_cloud_server *s;
     struct da_cloud_header *h;
     struct curl_slist *hd;
@@ -279,7 +279,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         return (-1);
     }
 
-    if ((phead->dcm = da_cloud_mem_create(DETECT_MEMSIZE)) == NULL) {
+    if ((phead->dcm = da_cloud_membuf_create(DETECT_MEMSIZE)) == NULL) {
         da_cloud_log(config->efp, "properties cannot allocate pool", NULL);
         return (-1);
     }
@@ -291,7 +291,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     _ret = -1;
     strcpy(phead->cachesource, "none");
     da_list_init(&phead->list);
-    config->cache_cfg.cache_dcm = phead->dcm;
+    phead->root = phead->dcm;
 
     config->cops.get(&config->cache_cfg, head->cachekey, &cacheval);
     if (cacheval != NULL) {
@@ -338,7 +338,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
             if (config->cops.set(&config->cache_cfg, head->cachekey, dr->buf) == -1)
                 da_cloud_log(config->efp, "could not cache %s", head->cachekey, NULL);
 
-            cacheval = da_cloud_mem_strdup(phead->dcm, dr->buf);
+            cacheval = da_cloud_membuf_strdup(&phead->dcm, dr->buf);
             strcpy(phead->cachesource, "cloud");
             data_reader_free(dr);
             curl_slist_free_all(hd);
@@ -364,16 +364,16 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         json_t *properties = json_object_get(response, "properties");
         void *it = json_object_iter(properties);
         while (it) {
-            struct da_cloud_property *p = da_cloud_mem_alloc(phead->dcm, sizeof(*p));
+            struct da_cloud_property *p = da_cloud_membuf_alloc(&phead->dcm, sizeof(*p));
             const char *key = json_object_iter_key(it);
             json_t *value = json_object_iter_value(it);
             int type = json_typeof(value);
-            p->name = da_cloud_mem_strdup(phead->dcm, key);
+            p->name = da_cloud_membuf_strdup(&phead->dcm, key);
 
             switch (type) {
                 case JSON_STRING:
                     p->type = DA_CLOUD_STRING;
-                    p->value.s = da_cloud_mem_strdup(phead->dcm, json_string_value(value));
+                    p->value.s = da_cloud_membuf_strdup(&phead->dcm, json_string_value(value));
                     break;
                 case JSON_TRUE:
                     p->type = DA_CLOUD_BOOL;
@@ -389,7 +389,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
                     break;
                 default:
                     p->type = DA_CLOUD_UNKNOWN;
-                    p->value.s = da_cloud_mem_strdup(phead->dcm, "(unknown)");
+                    p->value.s = da_cloud_membuf_strdup(&phead->dcm, "(unknown)");
                     break;
             }
 

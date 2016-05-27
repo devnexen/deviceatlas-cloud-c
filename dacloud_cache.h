@@ -28,7 +28,8 @@ struct da_cloud_mem;
 struct da_cloud_cache_cfg {
     void *data;
     void *cache_obj;
-    struct da_cloud_mem *cache_dcm;
+    struct da_cloud_membuf *cache_root;
+    struct da_cloud_membuf *cache_dcm;
     FILE *efp;
     char *cache_cfg_str;
     size_t expiration;

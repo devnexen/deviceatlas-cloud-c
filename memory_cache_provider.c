@@ -22,7 +22,13 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
     cfg->cache_obj = NULL;
     guint *threshold;
 
-    threshold = malloc(sizeof(*threshold));
+    cfg->cache_dcm = da_cloud_membuf_create(1024);
+    if (cfg->cache_dcm == NULL) {
+        da_cloud_log(cfg->efp, "could not allocate mem pool");
+        return (-1);
+    }
+    cfg->cache_root = cfg->cache_dcm;
+    threshold = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(*threshold));
     if (threshold == NULL) {
         da_cloud_log(cfg->efp, "could not allocate threshold data");
         return (-1);
@@ -30,7 +36,6 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
 
     hash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     if (hash == NULL) {
-        free(threshold);
         return (-1);
     }
 
@@ -63,7 +68,7 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) 
         g_key = key;
         g_value	= g_hash_table_lookup(cfg->cache_obj, g_key);
         if (g_value != NULL) {
-            *value = strdup((char *)g_value);
+            *value = da_cloud_membuf_strdup(&cfg->cache_dcm, (char *)g_value);
             ret = 0;
         }
     }
@@ -89,9 +94,10 @@ memory_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *va
 void
 memory_cache_fini(struct da_cloud_cache_cfg *cfg) {
     if (cfg->cache_obj != NULL) {
-        free(cfg->data);
         g_hash_table_destroy(cfg->cache_obj);
     }
+
+    da_cloud_membuf_free(cfg->cache_root);
 }
 
 #else
@@ -129,16 +135,21 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
     int *threshold = NULL;
     cfg->cache_obj = NULL;
 
-    threshold = malloc(sizeof(*threshold));
+    cfg->cache_dcm = da_cloud_membuf_create(1024);
+    if (cfg->cache_dcm == NULL) {
+        da_cloud_log(cfg->efp, "could not allocate mem pool");
+        return (-1);
+    }
+    cfg->cache_root = cfg->cache_dcm;
+    threshold = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(*threshold));
     if (threshold == NULL) {
         da_cloud_log(cfg->efp, "could not allocate threshold");
         return (-1);
     }
 
-    mc = calloc(1, sizeof(struct memory_cache));
+    mc = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(struct memory_cache));
     if (mc == NULL) {
         da_cloud_log(cfg->efp, "could not allocate tailq");
-        free(threshold);
         return (-1);
     }
 
@@ -175,7 +186,7 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key,
         TAILQ_FOREACH(mce, &mc->entries, entry) {
             if (strcmp(key, mce->key) == 0) {
                 ret = 0;
-                *value = da_cloud_mem_strdup(cfg->cache_dcm, mce->value);
+                *value = da_cloud_membuf_strdup(&cfg->cache_dcm, mce->value);
                 break;
             }
         }
@@ -193,9 +204,9 @@ memory_cache_set(struct da_cloud_cache_cfg *cfg, const char *key,
 
     if (cfg->cache_obj != NULL) {
         mc = cfg->cache_obj;
-        mce = da_cloud_mem_alloc(cfg->cache_dcm, sizeof(*mce));
-        mce->key = da_cloud_mem_strdup(cfg->cache_dcm, key);
-        mce->value = da_cloud_mem_strdup(cfg->cache_dcm, value);
+        mce = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(*mce));
+        mce->key = da_cloud_membuf_strdup(&cfg->cache_dcm, key);
+        mce->value = da_cloud_membuf_strdup(&cfg->cache_dcm, value);
         TAILQ_INSERT_TAIL(&mc->entries, mce, entry);
         mc->cnt ++;
         ret = 0;
@@ -209,9 +220,9 @@ memory_cache_fini(struct da_cloud_cache_cfg *cfg) {
     if (cfg->cache_obj != NULL) {
         struct memory_cache *mc = cfg->cache_obj;
         memory_cache_removeall(mc);
-        free(cfg->data);
-        free(cfg->cache_obj);
     }
+
+    da_cloud_mem_free(cfg->cache_root);
 }
 
 #endif
