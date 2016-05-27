@@ -62,6 +62,7 @@ da_cloud_membuf_create(size_t needed)
     if (dcm->p == NULL) {
         free(dcm);
         dcm = NULL;
+        return (NULL);
     }
 
     dcm->n = NULL;
