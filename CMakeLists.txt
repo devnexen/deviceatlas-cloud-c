@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 # mandatory libraries
 find_path(HAVE_CONFIG libconfig.h)
 find_path(HAVE_CURL curl/curl.h)
@@ -16,6 +17,13 @@ find_path(HAVE_MEMCACHED libmemcached/memcached.h)
 
 # CUnit
 find_path(HAVE_CUNIT CUnit/CUnit.h)
+
+if (JEMALLOC)
+    find_package(JeMalloc)
+    if (JEMALLOC_LIBRARIES)
+        message(STATUS "Jemalloc support")
+    endif()
+endif()
 
 set(CACHELIBS "")
 
@@ -71,7 +79,7 @@ message(STATUS "${LIBTYPE} library version")
 file(GLOB SRCS *.c)
 include_directories(${HAVE_CURL})
 add_library(dacloud ${LIBTYPE} ${SRCS})
-target_link_libraries(dacloud ${CONFIG} ${CURL} ${JANSSON} ${CRYPTO} ${CACHELIBS})
+target_link_libraries(dacloud ${CONFIG} ${CURL} ${JANSSON} ${CRYPTO} ${CACHELIBS} ${JEMALLOC_LIBRARIES})
 set_target_properties(dacloud PROPERTIES SOVERSION 1.0)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")

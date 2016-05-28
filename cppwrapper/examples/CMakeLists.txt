@@ -1,3 +1,3 @@
 include_directories(..)
 add_executable(example example.cpp)
-target_link_libraries(example dacloudcpp)
+target_link_libraries(example dacloudcpp ${JEMALLOC_LIBRARIES})
