@@ -29,7 +29,7 @@ memcached_cache_init(struct da_cloud_cache_cfg *cfg) {
         memcached_free((memcached_st *)cfg->data);
         return (-1);
     } else {
-        cfg->cache_dcm = da_cloud_membuf_create(1024 * 2);
+        cfg->cache_dcm = da_cloud_membuf_create(1024 * 4);
         if (cfg->cache_dcm == NULL) {
             da_cloud_log(cfg->efp, "could not allocate mem pool");
             return (-1);
@@ -59,6 +59,8 @@ memcached_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **valu
             if (svalue != NULL) {
                 *value = da_cloud_membuf_strdup(&cfg->cache_dcm, svalue);
                 free(svalue);
+                if (*value == NULL)
+                    return (-1);
             }
         }
         memcached_pool_push(cfg->cache_obj, client);

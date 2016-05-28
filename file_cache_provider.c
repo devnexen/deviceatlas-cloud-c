@@ -99,7 +99,7 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         return (-1);
     }
 
-    cfg->cache_dcm = da_cloud_membuf_create(1024 * 2);
+    cfg->cache_dcm = da_cloud_membuf_create(1024 * 4);
     if (cfg->cache_dcm == NULL) {
         da_cloud_log(cfg->efp, "could not allocate mem pool", NULL);
         return (-1);
@@ -173,6 +173,12 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         rewind(cache);
 
         *value = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(char) * valuelen + 1);
+        if (*value == NULL) {
+            fclose(cache);
+            FILE_MTX_DISPOSE
+            da_cloud_log(cfg->efp, "could not allocate memory for value", NULL);
+            return (-1);
+        }
         fgets(*value, valuelen + 1, cache);
         flock(cachefd, LOCK_UN);
         fclose(cache);
@@ -201,6 +207,13 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         }
 
         *value = da_cloud_membuf_strdup(&cfg->cache_dcm, region);
+        if (*value == NULL) {
+            close(cachefd);
+            FILE_MTX_DISPOSE
+            da_cloud_log(cfg->efp, "could not allocate memory for value", NULL);
+            return (-1);
+        }
+
         munmap(region, valuelen);
         close(cachefd);
 #endif

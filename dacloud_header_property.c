@@ -43,7 +43,9 @@ da_cloud_print_property(FILE *fp, struct da_cloud_property *p) {
 int
 da_cloud_header_init(struct da_cloud_header_head *head) {
     da_list_init(&head->list);
-    head->dcm = da_cloud_membuf_create(DACLOUD_CACHEKEY_SIZE + (1024 * 2));
+    head->dcm = da_cloud_membuf_create(DACLOUD_CACHEKEY_SIZE + (1024 * 4));
+    if (head ->dcm == NULL)
+        return (-1);
     head->root = head->dcm;
     head->cachekey = da_cloud_membuf_alloc(&head->dcm,
             DACLOUD_CACHEKEY_SIZE * sizeof(char));

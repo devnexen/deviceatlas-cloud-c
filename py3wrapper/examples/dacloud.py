@@ -1,9 +1,18 @@
 from dacloud import DaCloud
 import sys
+import time
 
 if len(sys.argv) == 3:
     dc = DaCloud()
+    props= {}
+    start = end = 0
     if dc.load_config(sys.argv[1]):
-        print(dc.detect({"user-agent":sys.argv[2]}))
+        print("config loaded\n")
+        start = time.time()
+        for x in range(0, 100):
+            props = dc.detect({"user-agent":sys.argv[2]})
+        end = time.time()
 
-    print("the cache id is %s" % dc.cache_id())
+    print(props)
+    print("Time spent for 100 detections %ld\n" % (end - start))
+    print("the cache id is %s\n" % dc.cache_id())

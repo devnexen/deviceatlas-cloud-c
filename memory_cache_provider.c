@@ -22,7 +22,7 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
     cfg->cache_obj = NULL;
     guint *threshold;
 
-    cfg->cache_dcm = da_cloud_membuf_create(1024);
+    cfg->cache_dcm = da_cloud_membuf_create(1024 * 4);
     if (cfg->cache_dcm == NULL) {
         da_cloud_log(cfg->efp, "could not allocate mem pool");
         return (-1);
@@ -71,7 +71,8 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) 
             char *svalue = strdup(g_value);
             *value = da_cloud_membuf_strdup(&cfg->cache_dcm, svalue);
             free(svalue);
-            ret = 0;
+            if (*value != NULL)
+                ret = 0;
         }
     }
 
@@ -137,7 +138,7 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
     int *threshold = NULL;
     cfg->cache_obj = NULL;
 
-    cfg->cache_dcm = da_cloud_membuf_create(1024);
+    cfg->cache_dcm = da_cloud_membuf_create(1024 * 4);
     if (cfg->cache_dcm == NULL) {
         da_cloud_log(cfg->efp, "could not allocate mem pool");
         return (-1);
@@ -187,8 +188,10 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key,
 
         TAILQ_FOREACH(mce, &mc->entries, entry) {
             if (strcmp(key, mce->key) == 0) {
-                ret = 0;
                 *value = da_cloud_membuf_strdup(&cfg->cache_dcm, mce->value);
+                if (*value == NULL)
+                    return (ret);
+                ret = 0;
                 break;
             }
         }
@@ -207,8 +210,17 @@ memory_cache_set(struct da_cloud_cache_cfg *cfg, const char *key,
     if (cfg->cache_obj != NULL) {
         mc = cfg->cache_obj;
         mce = da_cloud_membuf_alloc(&cfg->cache_dcm, sizeof(*mce));
+        if (mce == NULL) {
+            return (ret);
+        }
         mce->key = da_cloud_membuf_strdup(&cfg->cache_dcm, key);
+        if (mce->key == NULL) {
+            return (ret);
+        }
         mce->value = da_cloud_membuf_strdup(&cfg->cache_dcm, value);
+        if (mce->value == NULL) {
+            return (ret);
+        }
         TAILQ_INSERT_TAIL(&mc->entries, mce, entry);
         mc->cnt ++;
         ret = 0;
