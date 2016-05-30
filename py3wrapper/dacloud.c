@@ -128,8 +128,6 @@ dacloudmod_detect(PyObject *_self, PyObject *args)
             continue;
 
         da_cloud_header_add(&hhead, hn, hv);
-        Py_DECREF(hv);
-        Py_DECREF(hn);
     }
 
     if (da_cloud_detect(&self->cfg, &hhead, &phead) == 0) {
