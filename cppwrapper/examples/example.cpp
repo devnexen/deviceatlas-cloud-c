@@ -44,9 +44,10 @@ main(int argc, char *argv[])
     std::cout << "cache key : " << dd->CacheKey() << std::endl;
     std::cout << "cache source : " << dd->CacheSource() << std::endl;
 
-    std::thread td[2] { std::thread(threadop, 0, dc, dh, dp),
-        std::thread(threadop, 1, dc, dh, dp) };
+    std::thread td[10];
+    for (size_t i = 0; i < sizeof(td) / sizeof(td[0]); i ++)
+        td[i] = std::thread(threadop, i, dc, dh, dp);
 
-    for (size_t i = 0; i < 2; i ++)
+    for (size_t i = 0; i < sizeof(td) / sizeof(td[0]); i ++)
         td[i].join();
 }
