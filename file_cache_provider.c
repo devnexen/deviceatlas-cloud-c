@@ -189,6 +189,13 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
             return (-1);
         }
 
+        if (flock(cachefd, LOCK_SH)  == -1) {
+            close(cachefd);
+            FILE_MTX_DISPOSE
+            da_cloud_log(cfg->efp, "could not lock the cache", NULL);
+            return (-1);
+        }
+
         valuelen = (size_t)lseek(cachefd, 0, SEEK_END);
         lseek(cachefd, 0, SEEK_SET);
 
@@ -196,13 +203,6 @@ file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
         if (region == ((void *)-1)) {
             close(cachefd);
             da_cloud_log(cfg->efp, "could not read the cache data '%s'", strerror(errno));
-            return (-1);
-        }
-
-        if (flock(cachefd, LOCK_SH)  == -1) {
-            close(cachefd);
-            FILE_MTX_DISPOSE
-            da_cloud_log(cfg->efp, "could not lock the cache", NULL);
             return (-1);
         }
 
@@ -271,6 +271,13 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
             return (-1);
         }
 
+        if (flock(cachefd, LOCK_EX) == -1) {
+            close(cachefd);
+            FILE_MTX_DISPOSE
+            da_cloud_log(cfg->efp, "could not lock the cache", NULL);
+            return (-1);
+        }
+
         valuelen = strlen(value);
         ftruncate(cachefd, valuelen);
         char *region = mmap(NULL, valuelen, PROT_WRITE, MAP_SHARED, cachefd, 0);
@@ -278,13 +285,6 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
             close(cachefd);
             FILE_MTX_DISPOSE
             da_cloud_log(cfg->efp, "could not create the cache data '%s'", strerror(errno));
-            return (-1);
-        }
-
-        if (flock(cachefd, LOCK_EX) == -1) {
-            close(cachefd);
-            FILE_MTX_DISPOSE
-            da_cloud_log(cfg->efp, "could not lock the cache", NULL);
             return (-1);
         }
 
