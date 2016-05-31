@@ -247,11 +247,20 @@ _write_servers_response(char *data, size_t size, size_t nb, void *arg) {
         dr->buf = malloc(sizeof(char) * total + 1);
         memcpy(dr->buf, data, total);
     } else {
-        char *p = strndup(dr->buf, dr->buflen);
-        dr->buf = realloc(dr->buf, sizeof(char) * (dr->buflen + total + 1));
+        char *p;
+        char *buf = realloc(dr->buf, sizeof(char) * (dr->buflen + total + 1));
+        if (buf == NULL) {
+            free(dr->buf);
+            dr->buf = NULL;
+            return (0);
+        }
+
+        p = strndup(dr->buf, dr->buflen);
+        dr->buf = buf;
         memcpy(dr->buf, p, dr->buflen);
         memcpy(dr->buf + dr->buflen, data, total);
         free(p);
+        p = NULL;
     }
 
     dr->buflen += total;
@@ -338,7 +347,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
             if (config->cops.set(&config->cache_cfg, head->cachekey, dr->buf) == -1)
                 da_cloud_log(config->efp, "could not cache %s", head->cachekey, NULL);
 
-            cacheval = da_cloud_membuf_strdup(&phead->dcm, dr->buf);
+            cacheval = strdup(dr->buf);
             if (cacheval == NULL) {
                 da_cloud_log(config->efp, "cacheval could not be allocated", NULL);
                 data_reader_free(dr);
@@ -362,7 +371,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
 
  jsoninit:
     if (cacheval != NULL && strlen(cacheval) == 0)
-        goto end;
+        goto fcache;
     response = json_loads(cacheval, JSON_PRESERVE_ORDER, &err);
     if (strlen(err.text) > 0) {
         da_cloud_log(config->efp, "response: %s", err.text, NULL);
@@ -413,6 +422,12 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
         }
 
         json_decref(response);
+    }
+
+fcache:
+    if (cacheval != NULL) {
+        free(cacheval);
+        cacheval = NULL;
     }
 
 end:

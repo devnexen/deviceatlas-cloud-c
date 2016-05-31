@@ -11,17 +11,17 @@ threadop(size_t i, std::shared_ptr<DaCloud> dc, std::shared_ptr<DaCloudHeaders> 
     DaCloudProperties dp)
 {
     auto dd = std::make_shared<DaCloudDetect>(*dc, *dh, dp);
-    std::cout << "thread " << i << ", model: " << dp["model"]->value.s << std::endl;
+    fprintf(stderr, "thread %zd, model: %s\n", i, dp.find("model") != dp.end() ? dp["model"]->value.s : "/");
 }
 
 int
 main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 3)
         exit(-1);
     std::string configpath(argv[1]);
     const std::string uakey = "user-agent";
-    const std::string uavalue = "iPhone";
+    const std::string uavalue = argv[2];
     auto dc = std::make_shared<DaCloud>(configpath); 
     auto dh = std::make_shared<DaCloudHeaders>();
     DaCloudProperties dp = DaCloudProperties();
