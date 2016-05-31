@@ -25,7 +25,6 @@ struct da_cloud_req {
 void *
 da_cloud_process_req(void *arg) {
     struct da_cloud_header_head hhead;
-    struct da_cloud_property_head phead;
 	struct da_cloud_property *p;
     struct da_cloud_req *req = arg;
     int i = 0;
@@ -33,15 +32,21 @@ da_cloud_process_req(void *arg) {
     da_cloud_header_init(&hhead);
     da_cloud_useragent_add(&hhead, "Dalvik/1.2.0 (Linux; U; Android 2.2.1; GT-S5830L Build/FROYO)");
     for (i = 0; i < req->iterations; i ++) {
+        struct da_cloud_property_head phead;
+        char *cachesource;
+        long id = -1;
         printf("thread %d/core %d (iteration %d) starts\n", req->tid, req->core, (i + 1));
         da_cloud_detect(&req->cfg, &hhead, &phead);
-        printf("thread %d/core %d cache key is %s\n", req->tid, req->core, hhead.cachekey);
         if (da_cloud_property(&phead, "id", &p) == 0)
-            printf("thread %d/core %d (iteration %d): id is %ld\n", req->tid, req->core, (i + 1),
-                    p->value.l);
-        printf("thread %d/core %d (iteration %d) ends from %s\n", req->tid, req->core, (i + 1), phead.cachesource);
+            id = p->value.l;
+        cachesource = strdup(phead.cachesource);
+        da_cloud_properties_free(&phead);
+        printf("thread %d/core %d cache key is %s\n", req->tid, req->core, hhead.cachekey);
+        printf("thread %d/core %d (iteration %d): id is %ld\n", req->tid, req->core, (i + 1),
+                id);
+        printf("thread %d/core %d (iteration %d) ends from %s\n", req->tid, req->core, (i + 1), cachesource);
+        free(cachesource);
     }
-    da_cloud_properties_free(&phead);
     da_cloud_header_free(&hhead);
     return (NULL);
 }
