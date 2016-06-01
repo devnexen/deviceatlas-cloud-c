@@ -247,7 +247,6 @@ _write_servers_response(char *data, size_t size, size_t nb, void *arg) {
         dr->buf = malloc(sizeof(char) * total + 1);
         memcpy(dr->buf, data, total);
     } else {
-        char *p;
         char *buf = realloc(dr->buf, sizeof(char) * (dr->buflen + total + 1));
         if (buf == NULL) {
             free(dr->buf);
@@ -255,12 +254,8 @@ _write_servers_response(char *data, size_t size, size_t nb, void *arg) {
             return (0);
         }
 
-        p = strndup(dr->buf, dr->buflen);
         dr->buf = buf;
-        memcpy(dr->buf, p, dr->buflen);
         memcpy(dr->buf + dr->buflen, data, total);
-        free(p);
-        p = NULL;
     }
 
     dr->buflen += total;
@@ -370,7 +365,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     curl_easy_cleanup(c);
 
  jsoninit:
-    if (cacheval != NULL && strlen(cacheval) == 0)
+    if (cacheval != NULL && (strlen(cacheval) == 0 || *cacheval != '{'))
         goto fcache;
     response = json_loads(cacheval, JSON_PRESERVE_ORDER, &err);
     if (strlen(err.text) > 0) {
