@@ -1,6 +1,13 @@
 DeviceAtlas Cloud client C Api
 ==============================
 
+[![Build Status](https://travis-ci.org/devnexen/deviceatlas-cloud-c.svg?branch=master)](https://travis-ci.org/devnexen/deviceatlas-cloud-c)
+
+<a href="https://scan.coverity.com/projects/device-atlas-cloud-c">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/6557/badge.svg"/>
+</a>
+
 It is a library which allows to use the DeviceAtlas Cloud service inside C/C++ code.
 More informations can be found in this page to get a licence key :
 
@@ -54,6 +61,7 @@ b/ Optional
 - CFLAGS=... LDFLAGS=... python setup.py build
 - A basic example is provided inside examples subfolder
 
+[![Build Status](https://travis-ci.org/devnexen/deviceatlas-cloud-c.svg?branch=master)](https://travis-ci.org/devnexen/deviceatlas-cloud-c)
 
 <a href="https://scan.coverity.com/projects/device-atlas-cloud-c">
   <img alt="Coverity Scan Build Status"
