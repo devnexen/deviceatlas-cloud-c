@@ -260,7 +260,8 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
             return (-1);
         }
 
-        fwrite(value, 1, strlen(value), cache);
+	valuelen = strlen(value);
+        fwrite(value, 1, valuelen, cache);
         flock(cachefd, LOCK_UN);
         fclose(cache);
 #else

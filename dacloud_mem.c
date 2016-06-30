@@ -22,7 +22,7 @@ da_cloud_mem_alloc(struct da_cloud_mem *dcm, size_t needed)
 {
     void *region = NULL;
     if (dcm != NULL) {
-        if (needed < (dcm->e - dcm->n)) {
+        if (needed < (size_t)(dcm->e - dcm->n)) {
             size_t n = (needed + 3) & 0xfffffffc;
             region = dcm->n;
             dcm->n += n;

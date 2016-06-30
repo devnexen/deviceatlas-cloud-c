@@ -40,7 +40,6 @@ main(int argc, char *argv[]) {
         struct da_cloud_header_head hhead;
         struct da_cloud_property_head phead;
         char buf[1024];
-        size_t i = 0;
         printf("default servers => %s\n", config.shead->dservers ? "yes" : "no");
         printf("manual ranking => %s\n", config.manual_ranking ? "yes" : "no");
         da_cloud_servers_ranking(stderr, config);

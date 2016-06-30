@@ -22,7 +22,7 @@ da_cloud_get_num_cores(void)
 void
 da_cloud_servers_ranking(FILE *fp, struct da_cloud_config config)
 {
-    int i;
+    size_t i;
     for (i = 0; i < config.shead->nb; i ++)
         da_cloud_print_server(fp, config.shead->servers[i]);
 }

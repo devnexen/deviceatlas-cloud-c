@@ -8,8 +8,10 @@ int
 main(int argc, char *argv[]) {
     struct da_cloud_config cfg;
     char *configpath = getenv("DACLOUD_CONFIG");
+    (void)argc;
+
     if (configpath == NULL || configpath[0] == '\0') {
-        fprintf(stderr, "DACLOUD_CONFIG environment variable needs to be defined\n");
+        fprintf(stderr, "%s: DACLOUD_CONFIG environment variable needs to be defined\n", argv[0]);
         exit(-1);
     }
 
