@@ -16,12 +16,13 @@ https://deviceatlas.com/resources/getting-started-cloud
 A local cache handler can be used to avoid using Cloud service hits with a same request.
 
 - At the moment a simple disk, a in-memory and memcached cache solutions are supported.
+- A new cache handler can be written via the cache's provider interface as long as the library used is multi thread safe.
 - 2 samples configuration files for each cache support are provided.
 - 3 examples which represents sort of use cases, batch, C++ example, multi thread and a simple one for pure speed benchmarking.
 - A simple C++ wrapper and an example (requires a C++11 compiler compliant, gcc >= 4.8 or clang).
 - A simple Python 3 wrapper (requires Python 3 C headers installed).
-- A new cache handler can be written via the cache's provider interface as long as the library used is multi thread safe.
 - A basic travis build configuration.
+- A basic test suite.
 
 1/ Operating systems
 ====================

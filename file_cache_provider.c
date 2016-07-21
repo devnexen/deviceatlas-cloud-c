@@ -91,7 +91,7 @@ file_cache_init(struct da_cloud_cache_cfg *cfg) {
         da_cloud_log(cfg->efp, "directory '%s' not found", cfg->cache_cfg_str, NULL);
         return (-1);
     }
-    if ((s.st_mode & S_IFMT) != S_IFDIR) {
+    if (!S_ISDIR(s.st_mode)) {
         da_cloud_log(cfg->efp, "directory '%s' invalid", cfg->cache_cfg_str, NULL);
         return (-1);
     } else if (!(s.st_mode & S_IWUSR) && !(s.st_mode & S_IWGRP) && !(s.st_mode & S_IWOTH)) {
