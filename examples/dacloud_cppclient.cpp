@@ -7,12 +7,22 @@
 
 using namespace std;
 
+static std::string pgname;
+
+static void
+usage()
+{
+    cout << pgname << " <config path> <user-agent>" << endl;
+    ::exit(-1);
+}
+
 int
 main(int argc, char *argv[]) {
+    pgname = string(argv[0]);
     if (argc < 3)
-        return (-1);
-    string configpath = argv[1];
-    string useragent = argv[2];
+        usage();
+    string configpath = string(argv[1]);
+    string useragent = string(argv[2]);
     da_cloud_config config;
     ::memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath.c_str()) == 0) {

@@ -22,10 +22,19 @@ struct da_cloud_req {
     int tid;
 };
 
+static const char *pgname;
+
+static void
+usage(void)
+{
+    printf("%s <config path> [<nb of iterations>]\n", pgname);
+    exit(-1);
+}
+
 void *
 da_cloud_process_req(void *arg) {
     struct da_cloud_header_head hhead;
-	struct da_cloud_property *p;
+    struct da_cloud_property *p;
     struct da_cloud_req *req = arg;
     int i = 0;
     memset(&hhead, 0, sizeof(hhead));
@@ -59,8 +68,9 @@ main(int argc, char *argv[]) {
     const char *configpath;
     int iterations = 1;
     int num_cores = da_cloud_get_num_cores();
+    pgname = argv[0];
     if (argc < 2)
-        return (-1);
+	usage();
     configpath = argv[1];
     if (argc > 2) {
         iterations = strtol(argv[2], 0, 10);

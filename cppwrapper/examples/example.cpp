@@ -5,6 +5,17 @@
 #include <thread>
 
 using namespace Da;
+using namespace std;
+
+
+static std::string pgname;
+
+static void
+usage()
+{
+    std::cout << pgname << " <config path> <user-agent>" << std::endl;
+    ::exit(-1);
+}
 
 void
 threadop(size_t i, std::shared_ptr<DaCloud> dc, std::shared_ptr<DaCloudHeaders> dh, 
@@ -17,8 +28,9 @@ threadop(size_t i, std::shared_ptr<DaCloud> dc, std::shared_ptr<DaCloudHeaders> 
 int
 main(int argc, char *argv[])
 {
+    pgname = std::string(argv[0]);
     if (argc < 3)
-        exit(-1);
+	usage();
     std::string configpath(argv[1]);
     const std::string uakey = "user-agent";
     const std::string uavalue = argv[2];

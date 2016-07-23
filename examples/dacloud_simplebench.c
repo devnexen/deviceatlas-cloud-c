@@ -4,13 +4,23 @@
 
 #define	DEFAULT_ITERATIONS	1000
 
+static const char *pgname;
+
+static void
+usage(void)
+{
+    printf("%s <config path> [<nb of iterations>]\n", pgname);
+    exit(-1);
+}
+
 int
 main(int argc, char *argv[]) {
     struct da_cloud_config config;
     const char *configpath, *iterationstr;
     int iterations = DEFAULT_ITERATIONS;
+    pgname = argv[0];
     if (argc < 2)
-        return (-1);
+        usage();
     if (argc >= 3) {
         iterationstr = argv[2];
         long tmp = strtol(iterationstr, 0, 10);

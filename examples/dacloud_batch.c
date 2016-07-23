@@ -6,6 +6,15 @@
 #include "dacloud.h"
 #include "dacloud_util.h"
 
+static const char *pgname;
+
+static void
+usage(void)
+{
+    printf("%s <config path> <input ... stdin or file>\n", pgname);
+    exit(-1);
+}
+
 static void
 print_headers(struct da_cloud_header_head hhead) {
     struct da_cloud_header *h;
@@ -32,8 +41,9 @@ int
 main(int argc, char *argv[]) {
     struct da_cloud_config config;
     const char *configpath;
+    pgname = argv[0];
     if (argc < 2)
-        return (-1);
+        usage();
     configpath = argv[1];
     memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath) == 0) {
