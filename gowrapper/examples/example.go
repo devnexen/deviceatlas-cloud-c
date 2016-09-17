@@ -6,7 +6,7 @@ import "os"
 
 func main() {
 	if len(os.Args) < 3 {
-		print("Needs the json file path and an user-agent\n");
+		print("Needs the config file path and an user-agent\n");
 		os.Exit(0);
 	}
 	confpath := os.Args[1]

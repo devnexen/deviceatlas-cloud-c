@@ -169,9 +169,9 @@ func Detect(f DaGo, hdrs map[string]string) map[string]interface{} {
 				    case C.DA_CLOUD_BOOL:
 					    value := C.dago_prop_getinteger(det.pp);
 					    if value == 1 {
-						    ret[pkey] = "true";
+						    ret[pkey] = true;
 					    } else {
-						    ret[pkey] = "false";
+						    ret[pkey] = false;
 					    }
 					    break;
 				    case C.DA_CLOUD_STRING, C.DA_CLOUD_UNKNOWN:
