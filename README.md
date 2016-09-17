@@ -21,6 +21,7 @@ A local cache handler can be used to avoid using Cloud service hits with a same 
 - 3 examples which represents sort of use cases, batch, C++ example, multi thread and a simple one for pure speed benchmarking.
 - A simple C++ wrapper and an example (requires a C++11 compiler compliant, gcc >= 4.8 or clang).
 - A simple Python 3 wrapper (requires Python 3 C headers installed).
+- A symple Golang wrapper (go >= 1.6 recommended).
 - A basic travis build configuration.
 - A basic test suite.
 
