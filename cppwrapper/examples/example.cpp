@@ -62,4 +62,6 @@ main(int argc, char *argv[])
 
     for (size_t i = 0; i < sizeof(td) / sizeof(td[0]); i ++)
         td[i].join();
+
+    return (0);
 }

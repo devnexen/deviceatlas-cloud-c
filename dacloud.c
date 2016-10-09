@@ -139,8 +139,13 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
             if (tmp >= 80 && tmp <= 65535)
                 port = (unsigned short)tmp;
         }
-        config->shead->servers = realloc(config->shead->servers,
+        struct da_cloud_server **ts = realloc(config->shead->servers,
                 (++nservers * sizeof(*config->shead->servers)));
+
+        if (!ts)
+            return (-1);
+
+        config->shead->servers = ts;
         s = malloc(sizeof(*s));
         s->host = strdup(host);
         s->port = port;
