@@ -77,12 +77,16 @@ endif()
 message(STATUS "${LIBTYPE} library version")
 
 file(GLOB SRCS *.c)
+file(GLOB HDRS *.h)
 include_directories(${HAVE_CURL})
 add_library(dacloud ${LIBTYPE} ${SRCS})
 target_link_libraries(dacloud ${CONFIG} ${CURL} ${JANSSON} ${CRYPTO} ${CACHELIBS} ${JEMALLOC_LIBRARIES})
 set_target_properties(dacloud PROPERTIES SOVERSION 1.0)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
+install(TARGETS dacloud DESTINATION /usr/local/lib)
+install(FILES ${HDRS} DESTINATION /usr/local/include)
 
 include(CheckCXXCompilerFlag)
 
