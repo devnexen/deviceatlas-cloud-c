@@ -88,6 +88,7 @@ main(int argc, char *argv[]) {
     configpath = argv[1];
     useragent = argv[2];
 
+    talloc_enable_leak_report_full();
     p_ctx = talloc_new(NULL);
     c_ctx = talloc_new(p_ctx);
 
@@ -100,7 +101,6 @@ main(int argc, char *argv[]) {
 
     atexit(__debug_report);
 
-    talloc_enable_leak_report_full();
     da_cloud_setallocator(&tac);
     memset(&config, 0, sizeof(config));
     if (da_cloud_init(&config, configpath) == 0) {
