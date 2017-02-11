@@ -3,10 +3,52 @@
 #include <stdlib.h>
 #include <limits.h>
 
+void *
+default_alloc(void *ctx, size_t size)
+{
+    (void)ctx;
+    return (malloc(size));
+}
+
+void *
+default_realloc(void *ctx, void *orig, size_t size)
+{
+    (void)ctx;
+    void *dest;
+
+    if (!(dest = realloc(orig, size))) {
+        free(orig);
+	orig = NULL;
+	return (NULL);
+    }
+
+    return (dest);
+}
+
+char *
+default_strdup(void *ctx, const char *src)
+{
+    (void)ctx;
+    return strdup(src);
+}
+
+void
+default_free(void *ctx, void *ptr)
+{
+    (void)ctx;
+    free(ptr);
+}
+
+void
+da_cloud_setallocator(struct da_cloud_allocator *dca)
+{
+    g_allocator = *dca;
+}
+
 struct da_cloud_mem *
 da_cloud_mem_create(size_t needed)
 {
-    struct da_cloud_mem *dcm = malloc(sizeof(*dcm) + needed);
+    struct da_cloud_mem *dcm = g_allocator.alloc(g_allocator.child_ctx, sizeof(*dcm) + needed);
     if (dcm == NULL)
         return (NULL);
 
@@ -47,20 +89,21 @@ void
 da_cloud_mem_free(struct da_cloud_mem *dcm)
 {
     if (dcm)
-        free(dcm);
+        g_allocator.free(g_allocator.child_ctx, dcm);
     dcm = NULL;
 }
 
 struct da_cloud_membuf *
 da_cloud_membuf_create(size_t needed)
 {
-    struct da_cloud_membuf *dcm = malloc(sizeof(*dcm));
+    struct da_cloud_membuf *dcm = g_allocator.alloc(g_allocator.child_ctx,
+		    sizeof(*dcm));
     if (dcm == NULL)
         return (NULL);
 
     dcm->p = da_cloud_mem_create(needed);
     if (dcm->p == NULL) {
-        free(dcm);
+        g_allocator.free(g_allocator.child_ctx, dcm);
         dcm = NULL;
         return (NULL);
     }
@@ -116,7 +159,7 @@ da_cloud_membuf_free(struct da_cloud_membuf *dcm)
     while (h) {
         struct da_cloud_membuf *n = h->n;
         da_cloud_mem_free(h->p);
-        free(h);
+        g_allocator.free(g_allocator.child_ctx, h);
         h = n;
     }
 }

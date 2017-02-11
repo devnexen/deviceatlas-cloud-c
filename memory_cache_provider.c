@@ -68,7 +68,7 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) 
         g_key = key;
         g_value	= g_hash_table_lookup(cfg->cache_obj, g_key);
         if (g_value != NULL) {
-            *value = strdup((const char *)g_value);
+            *value = g_allocator.strdup(g_allocator.child_ctx, (const char *)g_value);
             if (*value != NULL)
                 ret = 0;
         }
@@ -186,7 +186,7 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key,
 
         TAILQ_FOREACH(mce, &mc->entries, entry) {
             if (strcmp(key, mce->key) == 0) {
-                *value = strdup(mce->value);
+                *value = g_allocator.strdup(g_allocator.child_ctx, mce->value);
                 if (*value == NULL)
                     return (ret);
                 ret = 0;

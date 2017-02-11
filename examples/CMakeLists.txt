@@ -17,3 +17,12 @@ if (FCGI)
     add_executable(dacloud_fcgi dacloud_fcgi.c)
     target_link_libraries(dacloud_fcgi ${FCGILIB} dacloud ${JEMALLOC_LIBRARIES})
 endif()
+
+find_path(TALLOC talloc.h)
+
+if (TALLOC)
+    find_library(TALLOCLIB talloc)
+    message(STATUS "Talloc support")
+    add_executable(dacloud_talloc dacloud_talloc.c)
+    target_link_libraries(dacloud_talloc ${TALLOCLIB} dacloud)
+endif()

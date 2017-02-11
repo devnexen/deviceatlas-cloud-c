@@ -55,7 +55,8 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
     size_t nservers;
     int manual_ranking;
     config->efp = stderr;
-    config->shead = calloc(1, sizeof(*config->shead));
+    config->shead = g_allocator.alloc(g_allocator.main_ctx, sizeof(*config->shead));
+    memset(config->shead, 0, sizeof(*config->shead));
     if (config->shead == NULL) {
         da_cloud_log(config->efp, "servers list allocation failed", NULL);
         return (-1);
@@ -102,25 +103,26 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         config_lookup_string(&cfg, "user.cache.config", &cache_string);
     }
 
-    config->licence_key = strdup(licence_key);
+    config->licence_key = g_allocator.strdup(g_allocator.main_ctx, licence_key);
 
     if (config_lookup_int(&cfg, "user.manual_ranking", &manual_ranking) == CONFIG_TRUE)
         config->manual_ranking = manual_ranking;
 
     if (cache_name != NULL) {
         if (cache_string != NULL)
-            config->cache_cfg.cache_cfg_str = strdup(cache_string);
+            config->cache_cfg.cache_cfg_str = g_allocator.strdup(g_allocator.main_ctx,
+			    cache_string);
         cache_set(&config->cops, cache_name);
         if (config->cops.init(&config->cache_cfg) == -1) {
             if (config->cache_cfg.cache_cfg_str != NULL)
-                free(config->cache_cfg.cache_cfg_str);
+                g_allocator.free(g_allocator.main_ctx, config->cache_cfg.cache_cfg_str);
             da_cloud_log(config->efp, "could not set %s cache", cache_name);
             config_destroy(&cfg);
             return (-1);
         }
 
         if (config->cache_cfg.cache_cfg_str != NULL)
-            free(config->cache_cfg.cache_cfg_str);
+            g_allocator.free(g_allocator.main_ctx, config->cache_cfg.cache_cfg_str);
     }
 
     if ((servers = config_lookup(&cfg, "servers")) == NULL)
@@ -139,15 +141,15 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
             if (tmp >= 80 && tmp <= 65535)
                 port = (unsigned short)tmp;
         }
-        struct da_cloud_server **ts = realloc(config->shead->servers,
+        struct da_cloud_server **ts = g_allocator.realloc(g_allocator.main_ctx, config->shead->servers,
                 (++nservers * sizeof(*config->shead->servers)));
 
         if (!ts)
             return (-1);
 
         config->shead->servers = ts;
-        s = malloc(sizeof(*s));
-        s->host = strdup(host);
+        s = g_allocator.alloc(g_allocator.main_ctx, sizeof(*s));
+        s->host = g_allocator.strdup(g_allocator.main_ctx, host);
         s->port = port;
         config->shead->servers[nservers - 1] = s;
         config->shead->nb = nservers;
@@ -158,7 +160,7 @@ noservers:
     if (nservers == 0) {
         size_t i = 0;
         nservers = sizeof(default_servers) / sizeof(default_servers[0]);
-        config->shead->servers = malloc(nservers * sizeof(*config->shead->servers));
+        config->shead->servers = g_allocator.alloc(g_allocator.main_ctx, nservers * sizeof(*config->shead->servers));
         for (i = 0; i < nservers; i ++)
             config->shead->servers[i] = &default_servers[i];
         config->shead->nb = nservers;
@@ -193,8 +195,8 @@ static void
 data_reader_free(struct data_reader *dr) {
     if (dr != NULL) {
         if (dr->buf != NULL)
-            free(dr->buf);
-        free(dr);
+            g_allocator.free(g_allocator.child_ctx, dr->buf);
+        g_allocator.free(g_allocator.child_ctx, dr);
     }
 }
 
@@ -249,15 +251,13 @@ _write_servers_response(char *data, size_t size, size_t nb, void *arg) {
     struct data_reader *dr = (struct data_reader *)arg;
     size_t total = (size * nb);
     if (dr->buflen == 0) {
-        dr->buf = malloc(sizeof(char) * total + 1);
+        dr->buf = g_allocator.alloc(g_allocator.child_ctx, sizeof(char) * total + 1);
         memcpy(dr->buf, data, total);
     } else {
-        char *buf = realloc(dr->buf, sizeof(char) * (dr->buflen + total + 1));
-        if (buf == NULL) {
-            free(dr->buf);
-            dr->buf = NULL;
+        char *buf = g_allocator.realloc(g_allocator.child_ctx,
+			dr->buf, sizeof(char) * (dr->buflen + total + 1));
+        if (buf == NULL)
             return (0);
-        }
 
         dr->buf = buf;
         memcpy(dr->buf + dr->buflen, data, total);
@@ -324,7 +324,8 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
     curl_easy_setopt(c, CURLOPT_HTTPHEADER, hd);
     curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, _write_servers_response);
     for (i = 0; i < config->shead->nb; i ++) {
-        struct data_reader *dr = calloc(1, sizeof(*dr));
+        struct data_reader *dr = g_allocator.alloc(g_allocator.child_ctx, sizeof(*dr));
+        memset(dr, 0, sizeof(*dr));
         char urlbuf[256];
         CURLcode ret;
         s = config->shead->servers[i];
@@ -347,7 +348,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
             if (config->cops.set(&config->cache_cfg, head->cachekey, dr->buf) == -1)
                 da_cloud_log(config->efp, "could not cache %s", head->cachekey, NULL);
 
-            cacheval = strdup(dr->buf);
+            cacheval = g_allocator.strdup(g_allocator.child_ctx, dr->buf);
             if (cacheval == NULL) {
                 da_cloud_log(config->efp, "cacheval could not be allocated", NULL);
                 data_reader_free(dr);
@@ -426,7 +427,7 @@ da_cloud_detect(struct da_cloud_config *config, struct da_cloud_header_head *hea
 
 fcache:
     if (cacheval != NULL) {
-        free(cacheval);
+        g_allocator.free(g_allocator.child_ctx, cacheval);
         cacheval = NULL;
     }
 
@@ -441,19 +442,19 @@ da_cloud_fini(struct da_cloud_config *config) {
         if (config->shead->dservers == 0) {
             for (i = 0; i < config->shead->nb; i ++) {
                 struct da_cloud_server *s = *(config->shead->servers + i);
-                free(s->host);
-                free(s);
+                g_allocator.free(g_allocator.main_ctx, s->host);
+                g_allocator.free(g_allocator.main_ctx, s);
             }
         }
 
-        free(config->shead->servers);
-        free(config->shead);
+        g_allocator.free(g_allocator.main_ctx, config->shead->servers);
+        g_allocator.free(g_allocator.main_ctx, config->shead);
     }
 
     config->cops.fini(&config->cache_cfg);
     if (config->efp != stdin && config->efp != stderr)
         fclose(config->efp);
-    free(config->licence_key);
+    g_allocator.free(g_allocator.main_ctx, config->licence_key);
     curl_global_cleanup();
 }
 
