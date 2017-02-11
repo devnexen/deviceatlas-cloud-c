@@ -23,12 +23,13 @@
 #include <curl/curl.h>
 #include <stdio.h>
 
-#include "dacloud_cache.h"
-#include "dacloud_mem.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "dacloud_cache.h"
+#include "dacloud_mem.h"
+
 
 #define DACLOUD_CACHEKEY_SIZE       65
 /**
