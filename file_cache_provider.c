@@ -13,16 +13,22 @@
 
 #define FILE_CACHE_ATTEMPT(mode)                        \
     while ((cache = fopen(dir, mode)) == NULL) {        \
-        usleep(1000000);                                \
         ++ i;                                           \
-        if (i == 3)                                     \
+        if (i == 10)                                    \
         break;                                          \
     }                                                   \
 
-#define FILE_MTX_INIT                                   \
-   if (pthread_mutex_init(&mtx, NULL) != 0) {           \
-       da_cloud_log(cfg->efp, "could not lock", NULL);  \
-       return (-1);                                     \
+#define FILE_MTX_INIT                                           \
+   if (pthread_mutexattr_init(&attr) != 0) {                    \
+       da_cloud_log(cfg->efp, "could not lock", NULL);          \
+       return (-1);                                             \
+   }                                                            \
+                                                                \
+   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);      \
+                                                                \
+   if (pthread_mutex_init(&mtx, &attr) != 0) {			\
+       da_cloud_log(cfg->efp, "could not lock", NULL);          \
+       return (-1);                                             \
    }
 
 #define FILE_MTX_LOCK                                   \
@@ -31,6 +37,7 @@
 
 #define FILE_MTX_DISPOSE                                \
     pthread_mutex_unlock(&mtx);                         \
+    pthread_mutexattr_destroy(&attr);                   \
     pthread_mutex_destroy(&mtx);
 
 struct file_cache_cfg {
@@ -121,6 +128,7 @@ int
 file_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) {
     if (cfg->cache_obj != NULL && value != NULL) {
         FILE *cache = NULL;
+        pthread_mutexattr_t attr;
         pthread_mutex_t mtx;
         mode_t m;
         struct stat s;
@@ -230,6 +238,7 @@ int
 file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *value) {
     if (cfg->cache_obj != NULL) {
         FILE *cache = NULL;
+        pthread_mutexattr_t attr;
         pthread_mutex_t mtx;
         size_t i = 0, valuelen;
         mode_t m;
@@ -282,6 +291,7 @@ file_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *valu
 
         valuelen = strlen(value);
         ftruncate(cachefd, valuelen);
+	lseek(cachefd, 0, SEEK_SET);
         char *region = mmap(NULL, valuelen, PROT_WRITE, MAP_SHARED, cachefd, 0);
         if (region == ((void *)-1)) {
             close(cachefd);
