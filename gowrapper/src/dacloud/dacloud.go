@@ -152,6 +152,9 @@ func Detect(f DaGo, hdrs map[string]string) map[string]interface{} {
 			val := C.CString(v);
 
 			C.da_cloud_header_add(&det.h, key, val);
+
+			defer C.free((unsafe.Pointer)(val));
+			defer C.free((unsafe.Pointer)(key));
 		}
 
 		if (C.dago_cloud_detect(det) == 0) {
