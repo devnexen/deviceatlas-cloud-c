@@ -126,6 +126,7 @@ typedef struct da_cloud_property da_cloud_property_t;
 #cgo CFLAGS: -I. -I/usr/local/include
 */
 import "C"
+import "math"
 import "unsafe"
 
 type DaGo struct {
@@ -148,13 +149,18 @@ func Detect(f DaGo, hdrs map[string]string) map[string]interface{} {
 
 	if (det.hr == 0) {
 		for k, v := range hdrs {
-			key := C.CString(k);
-			val := C.CString(v);
+			var key [64]C.char;
+			var val [256]C.char;
+			bkey := []byte(k);
+			bval := []byte(v);
+			ksz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))));
+			vsz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))));
+			C.memcpy(unsafe.Pointer(&key[0]), unsafe.Pointer(&bkey[0]), ksz);
+			C.memcpy(unsafe.Pointer(&val[0]), unsafe.Pointer(&bval[0]), vsz);
+			key[ksz] = 0;
+			val[vsz] = 0;
 
-			C.da_cloud_header_add(&det.h, key, val);
-
-			defer C.free((unsafe.Pointer)(val));
-			defer C.free((unsafe.Pointer)(key));
+			C.da_cloud_header_add(&det.h, &key[0], &val[0]);
 		}
 
 		if (C.dago_cloud_detect(det) == 0) {
