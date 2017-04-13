@@ -130,73 +130,71 @@ import "math"
 import "unsafe"
 
 type DaGo struct {
-	dc C.dago;
-	R int;
+	dc C.dago
+	R  int
 }
 
 func Init(cfile string) DaGo {
-	var ret DaGo;
-	_cfile := C.CString(cfile);
-	ret.dc = (C.dago)(C.dago_cloud_init(_cfile));
-	ret.R = (int)(C.dago_cloud_load(ret.dc));
-	defer C.free((unsafe.Pointer)(_cfile));
-	return ret;	
+	var ret DaGo
+	_cfile := C.CString(cfile)
+	ret.dc = (C.dago)(C.dago_cloud_init(_cfile))
+	ret.R = (int)(C.dago_cloud_load(ret.dc))
+	defer C.free((unsafe.Pointer)(_cfile))
+	return ret
 }
 
 func Detect(f DaGo, hdrs map[string]string) map[string]interface{} {
-	ret := make(map[string]interface{});
-	det := (*C.dago_detect_t)(C.dago_cloud_header_init(f.dc));
+	ret := make(map[string]interface{})
+	det := (*C.dago_detect_t)(C.dago_cloud_header_init(f.dc))
 
-	if (det.hr == 0) {
+	if det.hr == 0 {
 		for k, v := range hdrs {
-			var key [64]C.char;
-			var val [256]C.char;
-			bkey := []byte(k);
-			bval := []byte(v);
-			ksz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))));
-			vsz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))));
-			C.memcpy(unsafe.Pointer(&key[0]), unsafe.Pointer(&bkey[0]), ksz);
-			C.memcpy(unsafe.Pointer(&val[0]), unsafe.Pointer(&bval[0]), vsz);
-			key[ksz] = 0;
-			val[vsz] = 0;
+			var key [64]C.char
+			var val [256]C.char
+			bkey := []byte(k)
+			bval := []byte(v)
+			ksz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))))
+			vsz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))))
+			C.memcpy(unsafe.Pointer(&key[0]), unsafe.Pointer(&bkey[0]), ksz)
+			C.memcpy(unsafe.Pointer(&val[0]), unsafe.Pointer(&bval[0]), vsz)
+			key[ksz] = 0
+			val[vsz] = 0
 
-			C.da_cloud_header_add(&det.h, &key[0], &val[0]);
+			C.da_cloud_header_add(&det.h, &key[0], &val[0])
 		}
 
-		if (C.dago_cloud_detect(det) == 0) {
-			for det.pp = det.p.list.slh_first;
-			    det.pp != nil;
-			    det.pp = (*C.da_cloud_property_t)(C.dago_prop_next(det.pp)) {
-				    ptype := (C.da_cloud_property_type)(C.dago_prop_type(det.pp));
-				    pkey := C.GoString(det.pp.name);
+		if C.dago_cloud_detect(det) == 0 {
+			for det.pp = det.p.list.slh_first; det.pp != nil; det.pp = (*C.da_cloud_property_t)(C.dago_prop_next(det.pp)) {
+				ptype := (C.da_cloud_property_type)(C.dago_prop_type(det.pp))
+				pkey := C.GoString(det.pp.name)
 
-				    switch (ptype) {
-				    case C.DA_CLOUD_LONG:
-					    value := C.dago_prop_getinteger(det.pp);
-					    ret[pkey] = (int)(value);
-					    break;
-				    case C.DA_CLOUD_BOOL:
-					    value := C.dago_prop_getinteger(det.pp);
-					    if value == 1 {
-						    ret[pkey] = true;
-					    } else {
-						    ret[pkey] = false;
-					    }
-					    break;
-				    case C.DA_CLOUD_STRING, C.DA_CLOUD_UNKNOWN:
-					    value := C.dago_prop_getstring(det.pp);
-					    ret[pkey] = C.GoString(value);
-					    break;
+				switch ptype {
+				case C.DA_CLOUD_LONG:
+					value := C.dago_prop_getinteger(det.pp)
+					ret[pkey] = (int)(value)
+					break
+				case C.DA_CLOUD_BOOL:
+					value := C.dago_prop_getinteger(det.pp)
+					if value == 1 {
+						ret[pkey] = true
+					} else {
+						ret[pkey] = false
+					}
+					break
+				case C.DA_CLOUD_STRING, C.DA_CLOUD_UNKNOWN:
+					value := C.dago_prop_getstring(det.pp)
+					ret[pkey] = C.GoString(value)
+					break
 				}
 			}
 		}
 
-		C.dago_detect_fini(det);
+		C.dago_detect_fini(det)
 	}
 
-	return ret;
+	return ret
 }
 
 func Finalize(f DaGo) {
-	C.dago_cloud_free(f.dc);
+	C.dago_cloud_free(f.dc)
 }
