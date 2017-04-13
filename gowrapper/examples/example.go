@@ -15,10 +15,13 @@ func main() {
 	if ret.R == 0 {
 		m := make(map[string]string);
 		m["user-agent"] = ua;
-		props := dacloud.Detect(ret, m);
-		for k, v := range props {
-			fmt.Printf("%s => ", k);
-			fmt.Println(v);
+		if props, err := dacloud.Detect(ret, m); err == nil {
+			for k, v := range props {
+				fmt.Printf("%s => ", k);
+				fmt.Println(v);
+			}
+		} else {
+			fmt.Printf("%s\n", err)
 		}
 	}
 	dacloud.Finalize(ret);

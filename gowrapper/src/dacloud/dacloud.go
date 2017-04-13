@@ -15,6 +15,7 @@ struct dago_cloud {
 };
 
 typedef struct dago_cloud dago_cloud_t;
+typedef struct da_cloud_property da_cloud_property_t;
 
 dago*
 dago_cloud_init(char *cfile)
@@ -71,10 +72,9 @@ dago_cloud_header_init(dago _d)
 }
 
 int
-dago_cloud_detect(dago _d)
+dago_cloud_detect(dago_detect_t *d)
 {
-	if (_d) {
-		dago_detect_t *d = (dago_detect_t *)_d;
+	if (d) {
 		return (da_cloud_detect(d->dcc, &d->h, &d->p));
 	}
 
@@ -82,51 +82,46 @@ dago_cloud_detect(dago _d)
 }
 
 void
-dago_detect_fini(dago _d)
+dago_detect_fini(dago_detect_t *d)
 {
-	if (_d) {
-		dago_detect_t *d = (dago_detect_t *)_d;
+	if (d) {
 		da_cloud_properties_free(&d->p);
 		da_cloud_header_free(&d->h);
 	}
 }
 
 dago
-dago_prop_next(dago _d)
+dago_prop_next(da_cloud_property_t *d)
 {
-	struct da_cloud_property *d = (struct da_cloud_property *)_d;
 	return (SLIST_NEXT(d, entries));
 }
 
 typedef enum da_cloud_property_type da_cloud_property_type;
 
 da_cloud_property_type
-dago_prop_type(dago _d)
+dago_prop_type(da_cloud_property_t *d)
 {
-	struct da_cloud_property *d = (struct da_cloud_property *)_d;
 	return (d->type);
 }
 
 long
-dago_prop_getinteger(dago _d)
+dago_prop_getinteger(da_cloud_property_t *d)
 {
-	struct da_cloud_property *d = (struct da_cloud_property *)_d;
 	return (d->value.l);
 }
 
 char *
-dago_prop_getstring(dago _d)
+dago_prop_getstring(da_cloud_property_t *d)
 {
-	struct da_cloud_property *d = (struct da_cloud_property *)_d;
 	return (d->value.s);
 }
 
-typedef struct da_cloud_property da_cloud_property_t;
 #cgo LDFLAGS: -L. -L/usr/local/lib -ldacloud
 #cgo CFLAGS: -I. -I/usr/local/include
 */
 import "C"
 import "math"
+import "runtime"
 import "unsafe"
 
 type DaGo struct {
@@ -134,8 +129,22 @@ type DaGo struct {
 	R  int
 }
 
-func Init(cfile string) DaGo {
-	var ret DaGo
+type DaError struct {
+	msg string
+}
+
+func newError(msg string) DaError {
+	a := DaError{msg: msg}
+	return a
+}
+
+func (a DaError) Error() string {
+	return a.msg
+}
+
+func Init(cfile string) *DaGo {
+	ret := &DaGo{}
+	runtime.SetFinalizer(ret, Finalize)
 	_cfile := C.CString(cfile)
 	ret.dc = (C.dago)(C.dago_cloud_init(_cfile))
 	ret.R = (int)(C.dago_cloud_load(ret.dc))
@@ -143,9 +152,9 @@ func Init(cfile string) DaGo {
 	return ret
 }
 
-func Detect(f DaGo, hdrs map[string]string) map[string]interface{} {
+func Detect(f *DaGo, hdrs map[string]string) (map[string]interface{}, error) {
 	ret := make(map[string]interface{})
-	det := (*C.dago_detect_t)(C.dago_cloud_header_init(f.dc))
+	det := (*C.dago_detect_t)(C.dago_cloud_header_init((*f).dc))
 
 	if det.hr == 0 {
 		for k, v := range hdrs {
@@ -187,14 +196,20 @@ func Detect(f DaGo, hdrs map[string]string) map[string]interface{} {
 					break
 				}
 			}
+		} else {
+			err := newError("lookup failed")
+			return ret, err
 		}
 
 		C.dago_detect_fini(det)
+	} else {
+		err := newError("headers initialization failed")
+		return ret, err
 	}
 
-	return ret
+	return ret, nil
 }
 
-func Finalize(f DaGo) {
-	C.dago_cloud_free(f.dc)
+func Finalize(f *DaGo) {
+	C.dago_cloud_free((*f).dc)
 }
