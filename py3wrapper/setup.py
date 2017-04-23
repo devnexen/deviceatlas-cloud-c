@@ -16,6 +16,7 @@ if 'LDFLAGS' in os.environ:
 dacloud = Extension('dacloud', sources = [ 'dacloud.c'], libraries = [ 'dacloud' ],
             include_dirs = [ cflags ], extra_link_args = [ ldflags ])
 
-setup ( name = 'dacloudmod', version = '0.1.0', description = 'Python 3 wrapper',
+setup ( name = 'dacloud', version = '0.1.0', description = 'Python 3 wrapper',
             ext_modules = [ dacloud ], author = 'David Carlier', author_email = 'devnexen@gmail.com',
+            url = 'https://github.com/devnexen/deviceatlas-cloud-c', license = 'LGPL',
             long_description = 'DeviceAtlas C Cloud API Python 3 wrapper' )
