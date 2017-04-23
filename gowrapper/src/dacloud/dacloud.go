@@ -120,9 +120,11 @@ dago_prop_getstring(da_cloud_property_t *d)
 #cgo CFLAGS: -I. -I/usr/local/include
 */
 import "C"
-import "math"
-import "runtime"
-import "unsafe"
+import (
+	"math"
+	"runtime"
+	"unsafe"
+)
 
 type DaGo struct {
 	dc C.dago
@@ -142,6 +144,7 @@ func (a DaError) Error() string {
 	return a.msg
 }
 
+// Initialize cloud API data with a config file path
 func Init(cfile string) *DaGo {
 	ret := &DaGo{}
 	runtime.SetFinalizer(ret, Finalize)
@@ -152,6 +155,8 @@ func Init(cfile string) *DaGo {
 	return ret
 }
 
+// Proceeds to the cloud service request and
+// if succesful, returns the properties set
 func Detect(f *DaGo, hdrs map[string]string) (map[string]interface{}, error) {
 	ret := make(map[string]interface{})
 	det := (*C.dago_detect_t)(C.dago_cloud_header_init((*f).dc))
@@ -210,6 +215,7 @@ func Detect(f *DaGo, hdrs map[string]string) (map[string]interface{}, error) {
 	return ret, nil
 }
 
+// Destructor eventually called byu the GC
 func Finalize(f *DaGo) {
 	C.dago_cloud_free((*f).dc)
 }
