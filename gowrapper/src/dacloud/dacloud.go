@@ -159,6 +159,10 @@ func Init(cfile string) *DaGo {
 // if succesful, returns the properties set
 func Detect(f *DaGo, hdrs map[string]string) (map[string]interface{}, error) {
 	ret := make(map[string]interface{})
+	if f == nil || (*f).dc == nil {
+		return ret, newError("dacloud.DaGo instance needs to be created by Init")
+	}
+
 	det := (*C.dago_detect_t)(C.dago_cloud_header_init((*f).dc))
 
 	if det.hr == 0 {
@@ -215,7 +219,19 @@ func Detect(f *DaGo, hdrs map[string]string) (map[string]interface{}, error) {
 	return ret, nil
 }
 
-// Destructor eventually called byu the GC
+// OO's variant of Detect
+func (f *DaGo) Detect(hdrs map[string]string) (map[string]interface{}, error) {
+	return Detect(f, hdrs)
+}
+
+// Destructor eventually called by the GC
 func Finalize(f *DaGo) {
-	C.dago_cloud_free((*f).dc)
+	if f != nil && (*f).dc != nil {
+		C.dago_cloud_free((*f).dc)
+	}
+}
+
+// OO' variant of Finalize
+func (f *DaGo) Finalize() {
+	Finalize(f)
 }
