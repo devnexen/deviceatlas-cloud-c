@@ -44,6 +44,7 @@ dago_cloud_free(dago _d)
 		dago_cloud_t *d = (dago_cloud_t *)_d;
 		da_cloud_fini(&d->dcc);
 		free(d);
+		d = NULL;
 	}
 }
 
