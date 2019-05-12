@@ -52,7 +52,7 @@ main(int argc, char *argv[]) {
         char buf[1024];
         printf("default servers => %s\n", config.shead->dservers ? "yes" : "no");
         printf("manual ranking => %s\n", config.manual_ranking ? "yes" : "no");
-        da_cloud_servers_ranking(stderr, config);
+        da_cloud_servers_ranking(stderr, &config);
         while ((fgets(buf, sizeof(buf), stdin))) {
             char *b;
             char *p = buf;

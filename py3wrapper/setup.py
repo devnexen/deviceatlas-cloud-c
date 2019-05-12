@@ -3,7 +3,8 @@ import os
 import sys
 
 if sys.version_info[0] < 3:
-    raise "Python 3 only is supported"
+    "Python 3 only is supported"
+    raise
 
 cflags = '.'
 ldflags = ''

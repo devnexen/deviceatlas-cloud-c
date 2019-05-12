@@ -1,6 +1,7 @@
 #include <string.h>
 #ifdef   HAVE_MEMCACHED
 
+#include <time.h>
 #include <libmemcached/memcached.h>
 #include <libmemcached/util.h>
 

@@ -20,9 +20,9 @@ da_cloud_get_num_cores(void)
 #endif
 
 void
-da_cloud_servers_ranking(FILE *fp, struct da_cloud_config config)
+da_cloud_servers_ranking(FILE *fp, struct da_cloud_config *config)
 {
     size_t i;
-    for (i = 0; i < config.shead->nb; i ++)
-        da_cloud_print_server(fp, config.shead->servers[i]);
+    for (i = 0; i < config->shead->nb; i ++)
+        da_cloud_print_server(fp, config->shead->servers[i]);
 }

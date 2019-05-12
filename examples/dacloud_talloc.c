@@ -106,7 +106,7 @@ main(int argc, char *argv[]) {
     if (da_cloud_init(&config, configpath) == 0) {
         struct da_cloud_header_head hhead;
         struct da_cloud_property_head phead;
-        da_cloud_servers_ranking(stderr, config);
+        da_cloud_servers_ranking(stderr, &config);
 	memset(&hhead, 0, sizeof(hhead));
 	da_cloud_header_init(&hhead);
 	da_cloud_useragent_add(&hhead, useragent);
