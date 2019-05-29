@@ -1,0 +1,13 @@
+env:
+        ARCH: amd64
+
+task:
+        freebsd_instance:
+                image: freebsd-12-0-release-amd64
+        env:
+                ASSUME_ALWAYS_YES: TRUE
+        script:
+                - pkg install glib memcached libconfig cmake jansson cunit pkgconf
+                - cmake -DBUILD_TYPE=DebWithRelInfo
+                - make -j2
+                - ./tests/dacloud_tests
