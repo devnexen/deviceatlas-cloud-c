@@ -172,8 +172,8 @@ func Detect(f *DaGo, hdrs map[string]string) (map[string]interface{}, error) {
 			var val [256]C.char
 			bkey := []byte(k)
 			bval := []byte(v)
-			ksz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))))
-			vsz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key))))
+			ksz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key)-1)))
+			vsz := (C.size_t)(math.Min(float64(len(bkey)), float64(unsafe.Sizeof(key)-1)))
 			C.memcpy(unsafe.Pointer(&key[0]), unsafe.Pointer(&bkey[0]), ksz)
 			C.memcpy(unsafe.Pointer(&val[0]), unsafe.Pointer(&bval[0]), vsz)
 			key[ksz] = 0
