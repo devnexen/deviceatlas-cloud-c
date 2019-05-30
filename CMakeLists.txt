@@ -97,6 +97,10 @@ if (HAS_CXX11)
     subdirs(cppwrapper)
 endif()
 
+if (CMAKE_CXX_COMPILER MATCHES "clang")
+    subdirs(fuzz)
+endif()
+
 if (NOT ${HAVE_CUNIT} STREQUAL "HAVE_CUNIT-NOTFOUND")
     find_library(CUNIT cunit)
     message(STATUS "CUnit support")
