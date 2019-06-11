@@ -48,6 +48,9 @@ da_cloud_mem_strdup(struct da_cloud_mem *, const char *);
 void
 da_cloud_mem_free(struct da_cloud_mem *);
 
+void
+da_cloud_mem_zero(void *, size_t);
+
 /**
  * should be called before the main instance initialization
  * as the allocators are used internally for every part

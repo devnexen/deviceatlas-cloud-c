@@ -93,6 +93,13 @@ da_cloud_mem_free(struct da_cloud_mem *dcm)
     dcm = NULL;
 }
 
+void
+da_cloud_mem_zero(void *dst, size_t len)
+{
+    void *(*const volatile mem_zero)(void *, int, size_t) = &memset;
+    (void)mem_zero(dst, 0, len);
+}
+
 struct da_cloud_membuf *
 da_cloud_membuf_create(size_t needed)
 {

@@ -62,7 +62,7 @@ da_cloud_init(struct da_cloud_config *config, const char *confpath) {
         return (-1);
     }
 
-    memset(&config->cache_cfg, 0, sizeof(config->cache_cfg));
+    da_cloud_mem_zero(&config->cache_cfg, sizeof(config->cache_cfg));
 
     config->cache_cfg.expiration = CACHE_EXPIRATION;
     config->cache_cfg.efp = config->efp;
