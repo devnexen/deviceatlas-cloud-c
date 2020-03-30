@@ -33,6 +33,8 @@ struct da_cloud_cache_cfg {
     FILE *efp;
     char *cache_cfg_str;
     size_t expiration;
+    pthread_mutexattr_t attr;
+    pthread_mutex_t mtx;
 };
 
 struct da_cloud_cache_ops {
@@ -55,6 +57,29 @@ void mock_cache_fini(struct da_cloud_cache_cfg *);
 void cache_set(struct da_cloud_cache_ops *, const char *);
 
 void da_cloud_log(FILE *, const char *, ...);
+
+#define MTX_INIT                                                \
+   if (pthread_mutexattr_init(&cfg->attr) != 0) {                    \
+       da_cloud_log(cfg->efp, "could not lock", NULL);          \
+       return (-1);                                             \
+   }                                                            \
+                                                                \
+   pthread_mutexattr_settype(&cfg->attr, PTHREAD_MUTEX_NORMAL); \
+                                                                \
+   if (pthread_mutex_init(&cfg->mtx, &cfg->attr) != 0) {	    \
+       da_cloud_log(cfg->efp, "could not lock", NULL);          \
+       return (-1);                                             \
+   }
+
+#define MTX_LOCK											    \
+	pthread_mutex_lock(&cfg->mtx);
+
+#define MTX_UNLOCK                                              \
+    pthread_mutex_unlock(&mtx);
+
+#define MTX_DISPOSE                                             \
+    pthread_mutexattr_destroy(&cfg->attr);                      \
+    pthread_mutex_destroy(&cfg->mtx);
 
 #include "cache_providers.h"
 

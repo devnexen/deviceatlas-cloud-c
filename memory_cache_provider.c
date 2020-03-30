@@ -11,27 +11,6 @@
 #ifdef  HAVE_GLIB
 #include <glib.h>
 
-#define MEMY_MTX_INIT                                           \
-   if (pthread_mutexattr_init(&attr) != 0) {                    \
-       da_cloud_log(cfg->efp, "could not lock", NULL);          \
-       return (-1);                                             \
-   }                                                            \
-                                                                \
-   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);      \
-                                                                \
-   if (pthread_mutex_init(&mtx, &attr) != 0) {			\
-       da_cloud_log(cfg->efp, "could not lock", NULL);          \
-       return (-1);                                             \
-   }
-
-#define MEMY_MTX_LOCK											\
-	pthread_mutex_lock(&mtx);
-
-#define MEMY_MTX_DISPOSE                                \
-    pthread_mutex_unlock(&mtx);                         \
-    pthread_mutexattr_destroy(&attr);                   \
-    pthread_mutex_destroy(&mtx);
-
 const char *
 memory_cache_id(void) {
     return "memory";
@@ -69,6 +48,7 @@ memory_cache_init(struct da_cloud_cache_cfg *cfg) {
     }
 
     cfg->data = (void *)threshold;
+    MTX_INIT
 
     return (0);
 }
@@ -82,12 +62,11 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) 
     if (cfg->cache_obj != NULL && value != NULL) {
         pthread_mutexattr_t attr;
         pthread_mutex_t mtx;
-        MEMY_MTX_INIT
-        MEMY_MTX_LOCK
+        MTX_LOCK
         threshold = *((guint *)cfg->data);
         if (g_hash_table_size(cfg->cache_obj) >= threshold) {
             g_hash_table_remove_all(cfg->cache_obj);
-            MEMY_MTX_DISPOSE
+            MTX_UNLOCK
             return (ret);
         }
 
@@ -98,7 +77,7 @@ memory_cache_get(struct da_cloud_cache_cfg *cfg, const char *key, char **value) 
             if (*value != NULL)
                 ret = 0;
         }
-        MEMY_MTX_DISPOSE
+        MTX_UNLOCK
     }
 
     return (ret);
@@ -112,15 +91,14 @@ memory_cache_set(struct da_cloud_cache_cfg *cfg, const char *key, const char *va
     if (cfg->cache_obj != NULL) {
         pthread_mutexattr_t attr;
         pthread_mutex_t mtx;
-        MEMY_MTX_INIT
-        MEMY_MTX_LOCK
+        MTX_LOCK
         g_key = g_strdup(key);
         g_value = g_strdup(value);
         if (!g_hash_table_contains(cfg->cache_obj, (gconstpointer)g_key)) {
             g_hash_table_insert(cfg->cache_obj, g_key, g_value);
         }
         ret = 0;
-        MEMY_MTX_DISPOSE
+        MTX_UNLOCK
     }
 
     return (ret);
@@ -133,6 +111,7 @@ memory_cache_fini(struct da_cloud_cache_cfg *cfg) {
     }
 
     da_cloud_membuf_free(cfg->cache_root);
+    MTX_DISPOSE
 }
 
 #else
