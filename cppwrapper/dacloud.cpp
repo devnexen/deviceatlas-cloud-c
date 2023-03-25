@@ -4,7 +4,7 @@
 
 Da::DaCloudHeaders::DaCloudHeaders()
 {
-    hhead.cachekey = nullptr;
+    hhead.hash = 0;
     hhead.dcm = hhead.root = nullptr;
     int ret = da_cloud_header_init(&hhead);
     SetSet((ret == 0));

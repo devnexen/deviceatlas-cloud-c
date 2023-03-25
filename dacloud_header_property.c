@@ -47,10 +47,8 @@ da_cloud_header_init(struct da_cloud_header_head *head) {
     if (head ->dcm == NULL)
         return (-1);
     head->root = head->dcm;
-    head->cachekey = da_cloud_membuf_alloc(&head->dcm,
-            DACLOUD_CACHEKEY_SIZE * sizeof(char));
-    if (head->cachekey == NULL)
-        return (-1);
+    head->hash = 0;
+    memset(head->cachekey, 0, sizeof(head->cachekey));
 
     return (0);
 }
@@ -93,7 +91,10 @@ da_cloud_header_add(struct da_cloud_header_head *head,
             strncat(cachekeybuf, h->value, valuelen);
         }
     }
-    da_cloud_crypt_key(cachekeybuf, sizeof(cachekeybuf), head->cachekey, DACLOUD_CACHEKEY_SIZE);
+
+    head->hash = XXH64(cachekeybuf, sizeof(cachekeybuf), 0);
+    snprintf(head->cachekey, sizeof(head->cachekey), "%lu", head->hash);
+    head->cachekey[64] = 0;
 
     return (0);
 }

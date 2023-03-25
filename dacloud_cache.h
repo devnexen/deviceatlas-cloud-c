@@ -22,6 +22,10 @@
 #include <time.h>
 #include <stdio.h>
 
+#define XXH_IMPLEMENTATION
+#define XXH_INLINE_ALL
+#include <import/xxhash.h>
+
 struct da_cloud_config;
 struct da_cloud_mem;
 
@@ -46,7 +50,7 @@ struct da_cloud_cache_ops {
 };
 
 void
-da_cloud_crypt_key(char *, size_t, char *, size_t);
+da_cloud_crypt_key(char *, size_t, char *, size_t) __attribute__((deprecated));
 
 const char *mock_cache_id(void);
 int mock_cache_init(struct da_cloud_cache_cfg *);

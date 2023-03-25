@@ -5,6 +5,7 @@
 
 #include "dacloud_cache.h"
 
+// the sha256's api is itself obsolete since openssl 3.0
 void
 da_cloud_crypt_key(char *source, size_t sourcelen, char *result, size_t resultlen) {
     SHA256_CTX ctx;
