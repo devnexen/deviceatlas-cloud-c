@@ -46,7 +46,8 @@ struct da_cloud_header {
 
 struct da_cloud_header_head {
     /* keeping track of the cache key */
-    char *cachekey;
+    char cachekey[65];
+    uint64_t hash;
     struct da_cloud_membuf *root;
     struct da_cloud_membuf *dcm;
     SLIST_HEAD(da_cloud_header_list, da_cloud_header) list;
