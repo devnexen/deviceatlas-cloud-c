@@ -1,0 +1,13 @@
+[package]
+name = "deviceatlas-cloud-c"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "dacloud-rs"
+path = "examples/dacloud.rs"
+
+[build-dependencies]
+bindgen = "*"
+
+[dependencies]
